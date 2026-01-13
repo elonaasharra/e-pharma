@@ -1,0 +1,44 @@
+/* Wrapper i formes */
+.register-wrapper {
+    background: #ffffff;
+    padding: 35px 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* Titulli */
+.register-wrapper h3 {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Input fields */
+.register-wrapper .form-control {
+    height: 48px;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.register-wrapper .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+}
+
+/* Mesazhet e errorit */
+.register-wrapper span.text-danger {
+    font-size: 13px;
+}
+
+/* Button */
+.register-wrapper button {
+    height: 48px;
+    font-weight: 500;
+}
+
+/* Centering në faqe */
+.register-page {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,0 +1,23 @@
+.footer-nologin {
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    color: #333;
+}
+
+.footer-nologin h5,
+.footer-nologin h6 {
+    font-weight: 600;
+}
+
+.footer-nologin a {
+    color: #333;
+    text-decoration: none;
+}
+
+.footer-nologin a:hover {
+    text-decoration: underline;
+}
+
+.footer-nologin hr {
+    opacity: 0.2;
+}
