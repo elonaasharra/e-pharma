@@ -1,7 +1,13 @@
 <?php
+include_once __DIR__ . '/../../includes/login/header.php';
+
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/db.php';
 /** @var mysqli $conn */
+if (isset($_GET["id"])) {
+    header("Location: /e-pharma/public/user/profile.php");
+    exit;
+}
 
 $user_id = (int)$_SESSION["user_id"];
 

@@ -159,7 +159,7 @@ if ($remember_me === 1) {
 // role-based redirect (1=user, 2=admin sipas roles table)
 $location = "/e-pharma/public/user/profile.php";
 if ((int)$user["role_id"] === 2) {
-    $location = "/e-pharma/public/admin/users.php";
+    $location = "/e-pharma/public/admin/dashboard.php";
 }
 
 
