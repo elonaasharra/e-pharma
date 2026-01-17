@@ -30,3 +30,18 @@
 .dropdown-toggle {
     outline: 0;
 }
+/* ================= STICKY HEADER ================= */
+.site-header{
+    position: sticky;
+    top: 0;
+    z-index: 1050;     /* mbi carousel */
+    background: #fff;
+}
+
+/* ================= STICKY FOOTER ================= */
+.site-footer{
+    position: sticky;
+    bottom: 0;
+    z-index: 1040;
+    background: #fff;
+}

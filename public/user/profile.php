@@ -60,5 +60,5 @@ if (!$user) {
     <a href="/e-pharma/public/logout.php">Logout</a>
 </p>
 
-</body>
-</html>
+<?php
+include_once __DIR__ . '/../../includes/login/footer.php';

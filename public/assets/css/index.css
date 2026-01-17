@@ -1,0 +1,309 @@
+/* ===================== Sticky vetëm topbar (NAV) ===================== */
+.topbar-sticky{
+    position: sticky;
+    top: 0;
+    z-index: 1060;
+    background: #f8f9fa; /* bg-light */
+}
+
+/* pak hije kur rri sipër */
+.topbar-sticky{
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+}
+
+/* =================== CAROUSEL (më i ulët) =================== */
+#homeCarousel .carousel-item img{
+    width:100%;
+    height:340px;          /* default më i ulët se 420 */
+    object-fit:cover;
+}
+
+/* Tablet */
+@media (min-width: 768px){
+    #homeCarousel .carousel-item img{ height:400px; }
+}
+
+/* Desktop */
+@media (min-width: 992px){
+    #homeCarousel .carousel-item img{ height:460px; }
+}
+
+/* Large desktop */
+@media (min-width: 1200px){
+    #homeCarousel .carousel-item img{ height:520px; }
+}
+
+/* Caption */
+#homeCarousel .carousel-caption{
+    background: rgba(0,0,0,.22);
+    backdrop-filter: blur(2px);
+    border-radius: 14px;
+    padding: 16px 16px;
+    max-width: 560px;
+}
+#homeCarousel .carousel-caption h1{
+    font-weight:800;
+    margin-bottom:6px;
+}
+#homeCarousel .carousel-caption p{
+    margin-bottom:10px;
+}
+@media (max-width: 576px){
+    #homeCarousel .carousel-caption{
+        padding: 12px 12px;
+        border-radius: 12px;
+        max-width: 92%;
+    }
+    #homeCarousel .carousel-caption h1{ font-size: 1.25rem; }
+    #homeCarousel .carousel-caption p{ font-size: .95rem; }
+}
+
+/* ================= MINI STRIP ================= */
+.mini-strip{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.06);
+    border-radius:16px;
+    padding:16px 22px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.04);
+}
+
+.mini-strip .mini-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap: nowrap; /* desktop: 1 rresht */
+}
+
+.mini-strip .mini-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+    flex: 1 1 0;
+}
+
+.mini-strip .mini-icon{
+    width:40px;
+    height:40px;
+    border-radius:14px;
+    background:rgba(25,135,84,.10);
+    display:grid;
+    place-items:center;
+    font-size:18px;
+    flex-shrink:0;
+}
+
+.mini-strip .mini-title{
+    margin:0;
+    font-size:.86rem;
+    font-weight:700;
+    letter-spacing:.2px;
+    text-transform:uppercase;
+    line-height:1.15;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.mini-strip .mini-sub{
+    margin:2px 0 0;
+    font-size:.80rem;
+    color:#6c757d;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.mini-strip .mini-link{
+    color:inherit;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.mini-strip .mini-link:hover .mini-sub{ text-decoration:underline; }
+
+/* Tablet: nëse s’ka vend, kalon 2 rreshta (pa mbivendosje) */
+@media (max-width: 992px){
+    .mini-strip{ padding:14px 16px; }
+    .mini-strip .mini-row{
+        flex-wrap: wrap;
+        justify-content: center;
+        gap:12px;
+    }
+    .mini-strip .mini-item{
+        flex: 1 1 calc(50% - 12px);
+        max-width: calc(50% - 12px);
+    }
+    .mini-strip .mini-icon{
+        width:34px; height:34px; border-radius:12px; font-size:16px;
+    }
+    .mini-strip .mini-title{ font-size:.76rem; }
+    .mini-strip .mini-sub{ font-size:.72rem; }
+}
+
+/* Mobile */
+@media (max-width: 576px){
+    .mini-strip{ padding:12px 12px; border-radius:14px; }
+    .mini-strip .mini-item{
+        flex: 1 1 calc(50% - 10px);
+        max-width: calc(50% - 10px);
+    }
+    .mini-strip .mini-icon{
+        width:30px; height:30px; border-radius:10px; font-size:14px;
+    }
+    .mini-strip .mini-title{ font-size:.66rem; }
+    .mini-strip .mini-sub{ font-size:.62rem; }
+}
+
+/* ================= CATEGORY CARDS ================= */
+/* mos përdor inline style (min-height/font-size) — uniform */
+.cat-card{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    background:#ddd;
+    box-shadow:0 10px 28px rgba(0,0,0,.08);
+    transition:.18s ease;
+    aspect-ratio: 4 / 5;
+}
+.cat-card:hover{
+    transform: translateY(-3px);
+    box-shadow:0 14px 40px rgba(0,0,0,.12);
+}
+.cat-card img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transform: scale(1.01);
+}
+.cat-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.12), rgba(0,0,0,.02));
+}
+
+/* Badge në krye — të mos mbivendoset me tekstin e fotos */
+.cat-content{
+    position:absolute;
+    top:14px;
+    left:14px;
+    right:14px;
+    z-index:2;
+    display:flex;
+    justify-content:center;
+    text-align:center;
+}
+.cat-badge{
+    display:inline-block;
+    padding:10px 14px;
+    border-radius:14px;
+    background: rgba(0,0,0,.32);
+    backdrop-filter: blur(4px);
+}
+.cat-title{
+    margin:0;
+    color:#fff;
+    font-weight:800;
+    font-size:1.2rem;
+    line-height:1.1;
+    text-shadow:0 6px 18px rgba(0,0,0,.18);
+}
+.cat-cta{
+    display:block;
+    margin-top:6px;
+    color:#fff;
+    font-weight:600;
+    text-decoration:underline;
+    opacity:.95;
+}
+.cat-cta:hover{ opacity:1; }
+
+/* Cards pak më të vogla në desktop të madh */
+@media (min-width: 1200px){
+    .cat-card{ aspect-ratio: 5 / 6; } /* pak më “të shkurtra” */
+}
+
+/* Mobile */
+@media (max-width: 576px){
+    .cat-title{ font-size:1.05rem; }
+    .cat-badge{ padding:8px 12px; border-radius:12px; }
+}
+/* ================= BEST SELLERS ================= */
+.best-sellers{
+    background: #f8f9fa;
+    border-top: 1px solid rgba(0,0,0,.06);
+    border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.bs-card{
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,.05);
+    transition: transform .15s ease, box-shadow .15s ease;
+    height: 100%;
+    background: #fff;
+}
+
+.bs-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(0,0,0,.08);
+}
+
+.bs-thumb{
+    height: 210px;
+    background: #ffffff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 14px;
+}
+
+.bs-thumb img{
+    width:100%;
+    height:100%;
+    object-fit: contain; /* super për foto si CeraVe (vertikale) */
+}
+
+.bs-title{
+    font-weight: 800;
+    margin: 0 0 6px;
+    line-height: 1.2;
+}
+
+.bs-desc{
+    color:#6c757d;
+    margin:0;
+    font-size: .95rem;
+}
+
+.bs-price{
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.bs-badge{
+    position:absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(25,135,84,.95);
+    color:#fff;
+    font-weight:700;
+    font-size:.78rem;
+    padding: 6px 10px;
+    border-radius: 999px;
+}
+
+/* responsive */
+@media (min-width: 1200px){
+    .bs-thumb{ height: 190px; } /* pak më e vogël në desktop të madh */
+}
+@media (max-width: 576px){
+    .bs-thumb{ height: 180px; }
+    .bs-desc{ font-size: .92rem; }
+}

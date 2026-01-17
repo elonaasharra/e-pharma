@@ -1,11 +1,17 @@
 <?php
 require_once __DIR__ . '/../session.php';
+require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../cart.php';
+/** @var mysqli $conn */
 
 /* Nëse s’është i loguar → login */
 if (!isset($_SESSION["user_id"])) {
     header("Location: /e-pharma/public/login.php");
     exit;
 }
+
+$user_id = (int)$_SESSION["user_id"];
+$cart_count = cart_count_items($conn, $user_id);
 ?>
 <!doctype html>
 <html lang="en">
@@ -14,26 +20,43 @@ if (!isset($_SESSION["user_id"])) {
     <title>E-Pharma</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-          crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Local CSS (i njëjti stil si no_login) -->
+    <!-- Local CSS -->
     <link rel="stylesheet" href="/e-pharma/public/assets/css/register.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/header_nologin.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/footer_nologin.css">
+    <link rel="stylesheet" href="/e-pharma/public/assets/css/index.css">
 </head>
 <body>
 
-<nav class="py-2 bg-light border-bottom">
+<nav class="py-2 bg-light border-bottom topbar-sticky">
     <div class="container d-flex flex-wrap">
         <ul class="nav me-auto">
-            <li class="nav-item"><a href="/e-pharma/public/index.php" class="nav-link link-dark px-2 active">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">Products</a></li>
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">About</a></li>
+            <li class="nav-item">
+                <a href="/e-pharma/public/index.php" class="nav-link link-dark px-2 active">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/e-pharma/public/products.php" class="nav-link link-dark px-2">Products</a>
+            </li>
+
+            <li class="nav-item">
+                <a href="/e-pharma/public/my_cart.php" class="nav-link link-dark px-2">
+                    🛒 Shporta (
+                    <span id="cart-count"><?php echo (int)$cart_count; ?></span>
+                    )
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="#" class="nav-link link-dark px-2">About</a>
+            </li>
 
             <?php if ((int)($_SESSION["role_id"] ?? 0) === 2): ?>
-                <li class="nav-item"><a href="/e-pharma/public/admin/users.php" class="nav-link link-dark px-2">Admin</a></li>
+                <li class="nav-item">
+                    <a href="/e-pharma/public/admin/users.php" class="nav-link link-dark px-2">Admin</a>
+                </li>
             <?php endif; ?>
         </ul>
 

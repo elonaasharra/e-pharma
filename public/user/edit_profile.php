@@ -103,5 +103,5 @@ if (!$user) { die("User not found"); }
     });
 </script>
 
-</body>
-</html>
+<?php
+include_once __DIR__ . '/../../includes/login/footer.php';

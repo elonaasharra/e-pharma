@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="/e-pharma/public/assets/css/register.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/header_nologin.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/footer_nologin.css">
+    <link rel="stylesheet" href="/e-pharma/public/assets/css/index.css">
+
 
 </head>
 <body>
@@ -32,7 +34,7 @@
     </div>
 </nav>
 
-<header class="py-3 mb-4 border-bottom">
+<header class="py-3 mb-4 border-bottom " >
     <div class="container d-flex flex-wrap justify-content-center">
         <a href="/e-pharma/public/index.php" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
             <span class="fs-4">E-Pharma</span>

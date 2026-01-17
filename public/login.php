@@ -20,7 +20,7 @@
             </div>
 
             <div class="form-check mb-4">
-                <input class="form-check-input" type="checkbox" id="remember_me">
+                <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me" value="1">
                 <label class="form-check-label" for="remember_me">
                     Remember me
                 </label>
