@@ -35,6 +35,7 @@
     </div>
 </footer>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
         integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
         crossorigin="anonymous"></script>
@@ -45,12 +46,19 @@
         crossorigin="anonymous"></script>
 <!-- Local JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="/e-pharma/public/assets/js/register.js"></script>
-<script src="/e-pharma/public/assets/js/login.js"></script>
-
 <?php
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// JS sipas faqes
+if ($path === '/e-pharma/public/register.php') {
+    echo '<script src="/e-pharma/public/assets/js/register.js"></script>';
+}
+
+if ($path === '/e-pharma/public/login.php') {
+    echo '<script src="/e-pharma/public/assets/js/login.js"></script>';
+}
+
+// faqet që kanë shportë
 $pages_need_cart = [
         '/e-pharma/public/products.php',
         '/e-pharma/public/index.php',
@@ -61,6 +69,7 @@ if (in_array($path, $pages_need_cart, true)) {
     echo '<script src="/e-pharma/public/assets/js/cart.js"></script>';
 }
 ?>
+
 
 </body>
 </html>

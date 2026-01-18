@@ -23,15 +23,14 @@ if (!$product) {
     die("Product not found");
 }
 
-// kategorite fikse qe ke
 $categories = [
-    'dermokozmetike' => 'Dermo Cosmetic',
-    'baby'           => 'Mom & kids',
-    'suplemente'     => 'Suplemenete',
-    'skincare'       => 'Skincare',
-    'haircare'       => 'Haircare',
-    'oralcare'       => 'Oral care',
-    'higjiene'       => 'Higjiene',
+        'dermokozmetike' => 'Dermo Cosmetic',
+        'baby'           => 'Mom & kids',
+        'suplemente'     => 'Suplemenete',
+        'skincare'       => 'Skincare',
+        'haircare'       => 'Haircare',
+        'oralcare'       => 'Oral care',
+        'higjiene'       => 'Higjiene',
 ];
 ?>
 
@@ -42,6 +41,10 @@ $categories = [
 
     <div class="card shadow-sm">
         <div class="card-body">
+
+            <!-- ✅ Mesazhet ketu (jo popup localhost) -->
+            <div id="prodAlert" class="alert d-none" role="alert"></div>
+
             <form id="editProductForm" novalidate>
                 <input type="hidden" id="product_id" name="product_id" value="<?php echo (int)$product["id"]; ?>">
 
@@ -69,7 +72,7 @@ $categories = [
                         <select class="form-select" id="category_slug" name="category_slug">
                             <?php foreach ($categories as $slug => $label): ?>
                                 <option value="<?php echo htmlspecialchars($slug); ?>"
-                                    <?php echo ($slug === $product["category_slug"]) ? "selected" : ""; ?>>
+                                        <?php echo ($slug === $product["category_slug"]) ? "selected" : ""; ?>>
                                     <?php echo htmlspecialchars($label); ?>
                                 </option>
                             <?php endforeach; ?>
@@ -77,10 +80,20 @@ $categories = [
                         <div id="cat_msg" class="form-text text-danger"></div>
                     </div>
 
+                    <!-- ✅ Foto aktuale + upload i ri opsional -->
                     <div class="col-md-6">
-                        <label class="form-label">Image (path/URL)</label>
-                        <input class="form-control" id="image" name="image" value="<?php echo htmlspecialchars($product["image"] ?? ""); ?>">
-                        <div class="form-text">Shembull: /e-pharma/public/uploads/xxx.jpg</div>
+                        <label class="form-label">Current image</label>
+                        <?php if (!empty($product["image"])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo htmlspecialchars($product["image"]); ?>" style="max-width:120px; height:auto; border-radius:8px;">
+                            </div>
+                        <?php else: ?>
+                            <div class="form-text">No image</div>
+                        <?php endif; ?>
+
+                        <label class="form-label mt-2">Change image (optional)</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                        <div id="image_msg" class="form-text text-danger"></div>
                     </div>
 
                     <div class="col-12">
@@ -110,19 +123,28 @@ $categories = [
 $page_scripts = '
 <script>
 $(function(){
+
+  function showProdAlert(msg, type){
+    $("#prodAlert")
+      .removeClass("d-none alert-success alert-danger alert-warning alert-info")
+      .addClass("alert-" + type)
+      .text(msg);
+  }
+
   $("#editProductForm").on("submit", function(e){
     e.preventDefault();
 
-    $("#name_msg,#price_msg,#stock_msg,#cat_msg,#desc_msg").text("");
+    $("#name_msg,#price_msg,#stock_msg,#cat_msg,#desc_msg,#image_msg").text("");
+    $("#prodAlert").addClass("d-none");
 
     const id = $("#product_id").val();
     const name = $("#name").val().trim();
     const price = $("#price").val().trim();
     const stock = $("#stock").val().trim();
     const category_slug = $("#category_slug").val();
-    const image = $("#image").val().trim();
     const description = $("#description").val().trim();
     const is_active = $("#is_active").val();
+    const file = $("#image")[0].files[0] || null; // ✅ opsionale
 
     let err = 0;
 
@@ -138,30 +160,36 @@ $(function(){
 
     if(err > 0) return;
 
+    // ✅ FormData (me file nese ekziston)
+    let fd = new FormData();
+    fd.append("action", "update_product");
+    fd.append("id", id);
+    fd.append("name", name);
+    fd.append("price", price);
+    fd.append("stock", stock);
+    fd.append("category_slug", category_slug);
+    fd.append("description", description);
+    fd.append("is_active", is_active);
+    if (file) fd.append("image", file);
+
     $.ajax({
       type: "POST",
       url: "/e-pharma/public/ajax/ajax_admin_product.php",
+      data: fd,
+      processData: false,
+      contentType: false,
       dataType: "json",
-      data: {
-        action: "update_product",
-        id: id,
-        name: name,
-        price: price,
-        stock: stock,
-        category_slug: category_slug,
-        image: image,
-        description: description,
-        is_active: is_active
-      },
       success: function(res){
-        alert(res.message);
+        showProdAlert(res.message, res.status === "success" ? "success" : "danger");
         if(res.status === "success"){
-          window.location.href = "/e-pharma/public/admin/products.php";
+          setTimeout(function(){
+            window.location.href = "/e-pharma/public/admin/products.php";
+          }, 900);
         }
       },
       error: function(xhr){
         console.log(xhr.responseText);
-        alert("Server error");
+        showProdAlert("Server error", "danger");
       }
     });
   });

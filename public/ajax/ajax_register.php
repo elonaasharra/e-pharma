@@ -3,111 +3,101 @@ require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/mail.php';
 
 /** @var mysqli $conn */
-
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isset($_POST["action"]) || $_POST["action"] != "register") {
+if (!isset($_POST["action"]) || $_POST["action"] !== "register") {
     http_response_code(400);
-    echo json_encode(array("message" => "Invalid action"));
+    echo json_encode(["message" => "Invalid action"]);
     exit;
 }
 
-// 1) get data
-$name = isset($_POST["name"]) ? mysqli_real_escape_string($conn, $_POST["name"]) : "";
-$surname = isset($_POST["surname"]) ? mysqli_real_escape_string($conn, $_POST["surname"]) : "";
-$email = isset($_POST["email"]) ? mysqli_real_escape_string($conn, $_POST["email"]) : "";
-$password = isset($_POST["password"]) ? $_POST["password"] : "";
-$confirm_password = isset($_POST["confirm_password"]) ? $_POST["confirm_password"] : "";
+$name = isset($_POST["name"]) ? trim($_POST["name"]) : "";
+$surname = isset($_POST["surname"]) ? trim($_POST["surname"]) : "";
+$email = isset($_POST["email"]) ? trim($_POST["email"]) : "";
+$password = isset($_POST["password"]) ? (string)$_POST["password"] : "";
+$confirm_password = isset($_POST["confirm_password"]) ? (string)$_POST["confirm_password"] : "";
 
 $email_regex = "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/";
 $alpha_regex = "/^[a-zA-Z]{3,40}$/";
 
-// 2) Data Validation
+// VALIDIME
 if (!preg_match($alpha_regex, $name)) {
-    http_response_code(201);
-    echo json_encode(array("message" => "Name must be alphabumeric at least 3 letters."));
+    http_response_code(422);
+    echo json_encode(["message" => "Name must contain only letters (min 3)."]);
     exit;
 }
 if (!preg_match($alpha_regex, $surname)) {
-    http_response_code(201);
-    echo json_encode(array("message" => "Surname must be alphabumeric at least 3 letters."));
+    http_response_code(422);
+    echo json_encode(["message" => "Surname must contain only letters (min 3)."]);
     exit;
 }
 if (!preg_match($email_regex, $email)) {
-    http_response_code(201);
-    echo json_encode(array("message" => "E-Mail format is not allowed"));
+    http_response_code(422);
+    echo json_encode(["message" => "Invalid email format."]);
     exit;
 }
-if (empty($password) || strlen($password) < 8) {
-    http_response_code(201);
-    echo json_encode(array("message" => "Password must be at least 8 characters"));
+if ($password === "" || strlen($password) < 8) {
+    http_response_code(422);
+    echo json_encode(["message" => "Password must be at least 8 characters."]);
     exit;
 }
-if ($password != $confirm_password) {
-    http_response_code(201);
-    echo json_encode(array("message" => "Confirm password must be equal to password"));
-    exit;
-}
-
-// 3) Check if email exists
-$query_check = "SELECT id FROM users WHERE email = '".$email."' LIMIT 1";
-$result_check = mysqli_query($conn, $query_check);
-
-if (!$result_check) {
-    http_response_code(202);
-    echo json_encode(array(
-        "message" => "There is an error on Database",
-        "error" => mysqli_error($conn),
-        "error_number" => mysqli_errno($conn)
-    ));
+if ($password !== $confirm_password) {
+    http_response_code(422);
+    echo json_encode(["message" => "Passwords do not match."]);
     exit;
 }
 
-if (mysqli_num_rows($result_check) > 0) {
-    http_response_code(201);
-    echo json_encode(array("message" => "There is a user with that E-Mail"));
+// CHECK EMAIL (prepared)
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(["message" => "DB error", "error" => $conn->error]);
+    exit;
+}
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$res = $stmt->get_result();
+
+if ($res && $res->num_rows > 0) {
+    http_response_code(409);
+    echo json_encode(["message" => "There is a user with that E-Mail."]);
     exit;
 }
 
-// 4) Insert user (kolonat e tua)
+// INSERT
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-$verify_token = md5(uniqid(mt_rand(), true));
-$role_id = "1";
+$verify_token = md5(uniqid((string)mt_rand(), true));
+$role_id = 1;
 $is_verified = 0;
 
-$query_insert = "INSERT INTO users SET
-    name = '".$name."',
-    surname = '".$surname."',
-    email = '".$email."',
-    hashed_password = '".$hashed_password."',
-    role_id = '".$role_id."',
-    verify_token = '".$verify_token."',
-    is_verified = '".$is_verified."',
-    created_at = '".date("Y-m-d H:i:s")."'";
+$stmt = $conn->prepare("
+    INSERT INTO users (name, surname, email, hashed_password, role_id, verify_token, is_verified, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+");
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(["message" => "DB error", "error" => $conn->error]);
+    exit;
+}
+$stmt->bind_param("ssssisi", $name, $surname, $email, $hashed_password, $role_id, $verify_token, $is_verified);
 
-$result_insert = mysqli_query($conn, $query_insert);
-
-if (!$result_insert) {
-    http_response_code(202);
-    echo json_encode(array(
-        "message" => "There is an error on Database",
-        "error" => mysqli_error($conn),
-        "error_number" => mysqli_errno($conn)
-    ));
+if (!$stmt->execute()) {
+    http_response_code(500);
+    echo json_encode(["message" => "DB insert failed", "error" => $stmt->error]);
     exit;
 }
 
-$data = array(
+// EMAIL
+$data = [
     "user_email" => $email,
     "token" => $verify_token
-);
-
+];
 sendEmail($data);
 
-//  success (pa email akoma)
+// SUCCESS
 http_response_code(200);
-echo json_encode(array(
-    "message" => "User registered successfully (DB insert OK). Next: email verification.",
-    "location" => "login.php"
-));
+echo json_encode([
+    "message" => "Registered successfully. Check your email to verify your account.",
+    "location" => "/e-pharma/public/login.php"
+]);
 exit;

@@ -71,7 +71,9 @@ $pages_need_cart = [
 if (in_array($path, $pages_need_cart, true)) {
     echo '<script src="/e-pharma/public/assets/js/cart.js"></script>';
 }
+
 ?>
+
 </body>
 </html>
 

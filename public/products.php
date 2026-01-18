@@ -40,26 +40,66 @@ $cat = isset($_GET['cat']) ? trim($_GET['cat']) : '';
 if ($cat !== '' && !isset($categories[$cat])) {
     $cat = '';
 }
+//  KETE HOQA
+//
+//$res = null;
+//
+//if ($cat !== '') {
+//    $sql = "SELECT id, name, description, price, stock, image
+//            FROM products
+//            WHERE is_active = 1 AND category_slug = ?
+//            ORDER BY created_at DESC";
+//    $stmt = $conn->prepare($sql);
+//    $stmt->bind_param("s", $cat);
+//    $stmt->execute();
+//    $res = $stmt->get_result();
+//} else {
+//    $sql = "SELECT id, name, description, price, stock, image
+//            FROM products
+//            WHERE is_active = 1
+//            ORDER BY created_at DESC";
+//    $res = $conn->query($sql);
+//}
 
+// SHTOVA KETE KOD
+$q = isset($_GET['q']) ? trim($_GET['q']) : '';
 
 $res = null;
 
+$sql = "SELECT id, name, description, price, stock, image
+        FROM products
+        WHERE is_active = 1";
+
+$params = [];
+$types  = "";
+
+// filter kategori
 if ($cat !== '') {
-    $sql = "SELECT id, name, description, price, stock, image
-            FROM products
-            WHERE is_active = 1 AND category_slug = ?
-            ORDER BY created_at DESC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $cat);
-    $stmt->execute();
-    $res = $stmt->get_result();
-} else {
-    $sql = "SELECT id, name, description, price, stock, image
-            FROM products
-            WHERE is_active = 1
-            ORDER BY created_at DESC";
-    $res = $conn->query($sql);
+    $sql .= " AND category_slug = ?";
+    $types .= "s";
+    $params[] = $cat;
 }
+
+// search text
+if ($q !== '') {
+    $sql .= " AND (name LIKE ? OR description LIKE ?)";
+    $types .= "ss";
+    $like = "%" . $q . "%";
+    $params[] = $like;
+    $params[] = $like;
+}
+
+$sql .= " ORDER BY created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if ($types !== "") {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$res = $stmt->get_result();
+
 ?>
 
 <!-- ================= PAGE TITLE ================= -->

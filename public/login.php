@@ -4,8 +4,15 @@
     <div class="register-wrapper" style="max-width:520px; width:100%;">
 
         <h3 class="mb-4 text-center">Login</h3>
+        <?php if (isset($_GET['verified']) && $_GET['verified'] == '1'): ?>
+            <div class="alert alert-success">
+                 Email u verifikua me sukses. Tani mund të logohesh.
+            </div>
+        <?php endif; ?>
 
         <form id="loginForm" novalidate>
+<!--ndryshimet -->
+            <div id="loginAlert" class="alert d-none" role="alert"></div>
 
             <div class="form-group mb-4">
                 <input type="email" class="form-control" placeholder="Email"

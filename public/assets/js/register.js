@@ -1,9 +1,14 @@
-
-
 console.log("register.js loaded");
-// dmth qe kodi te ekzekutohet vetem pasi faqja te jete ngarkuar
+
 $(document).ready(function () {
-    //funksion ndihmes qe kontrollon nese nje input eshte bosh
+
+    function showRegisterAlert(msg, type) {
+        $("#registerAlert")
+            .removeClass("d-none alert-success alert-danger alert-warning alert-info")
+            .addClass("alert-" + type)
+            .text(msg);
+    }
+
     function isEmpty(val) {
         return !val || val.trim() === "";
     }
@@ -21,41 +26,36 @@ $(document).ready(function () {
         let alpha_regex = /^[a-zA-Z]{3,40}$/;
         let error = 0;
 
-        // reset
+        // reset UI
+        $("#registerAlert").addClass("d-none").text("").removeClass("alert-success alert-danger alert-warning alert-info");
         $(".form-control").removeClass("border-danger");
         $("span.text-danger").text("");
 
-//VALIDIME FRONT END
-
-        // Name
+        // VALIDIME FRONTEND
         if (!alpha_regex.test(name)) {
             $("#name").addClass("border-danger");
             $("#name_message").text("Name must contain only letters (min 3).");
             error++;
         }
 
-        // Surname
         if (!alpha_regex.test(surname)) {
             $("#surname").addClass("border-danger");
             $("#surname_message").text("Surname must contain only letters (min 3).");
             error++;
         }
 
-        // Email
         if (!email_regex.test(email)) {
             $("#email").addClass("border-danger");
             $("#email_message").text("Invalid email format.");
             error++;
         }
 
-        // Password
         if (isEmpty(password) || password.length < 8) {
             $("#password").addClass("border-danger");
             $("#password_message").text("Password must be at least 8 characters.");
             error++;
         }
 
-        // Confirm password
         if (confirm_password !== password) {
             $("#confirm_password").addClass("border-danger");
             $("#confirm_password_message").text("Passwords do not match.");
@@ -64,10 +64,8 @@ $(document).ready(function () {
 
         if (error > 0) return;
 
-        //pergatisim js qe te dergoj te dhena ne backend
-
         let data = new FormData();
-        data.append("action", "register");   // shumë e rëndësishme
+        data.append("action", "register");
         data.append("name", name);
         data.append("surname", surname);
         data.append("email", email);
@@ -80,15 +78,29 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             data: data,
-            success: function (response) {
-                console.log(response);
-                alert(response.message + (response.error ? ("\n" + response.error) : ""));
-            }
-            ,
-            error: function () {
-                alert("AJAX error");
-            }
+            dataType: "json",
 
+            success: function (response) {
+                if (typeof response === "string") response = JSON.parse(response);
+
+                showRegisterAlert(
+                    response.message || "Registration completed successfully.",
+                    response.error ? "danger" : "success"
+                );
+
+                // optional: reset form pas suksesit
+                if (!response.error) {
+                    $("#registerForm")[0].reset();
+                }
+            },
+
+            error: function (xhr) {
+                let msg = "AJAX error";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                showRegisterAlert(msg, "danger");
+            }
         });
 
     });

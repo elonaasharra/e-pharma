@@ -24,6 +24,8 @@ $categories = [
 
     <div class="card shadow-sm">
         <div class="card-body">
+            <div id="prodAlert" class="alert d-none" role="alert"></div>
+
             <form id="addProductForm" novalidate>
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -52,12 +54,18 @@ $categories = [
                             <?php endforeach; ?>
                         </select>
                     </div>
-
+<!--
                     <div class="col-md-6">
                         <label class="form-label">Image (path/URL)</label>
                         <input class="form-control" id="image" name="image">
                         <div class="form-text">Shembull: /e-pharma/public/uploads/xxx.jpg</div>
+                    </div>-->
+                    <div class="col-md-6">
+                        <label class="form-label">Image</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                        <div id="image_msg" class="form-text text-danger"></div>
                     </div>
+
 
                     <div class="col-12">
                         <label class="form-label">Description</label>
@@ -85,18 +93,27 @@ $categories = [
 $page_scripts = '
 <script>
 $(function(){
+
+  function showProdAlert(msg, type){
+    $("#prodAlert")
+      .removeClass("d-none alert-success alert-danger alert-warning alert-info")
+      .addClass("alert-" + type)
+      .text(msg);
+  }
+
   $("#addProductForm").on("submit", function(e){
     e.preventDefault();
 
-    $("#name_msg,#price_msg,#stock_msg").text("");
+    $("#name_msg,#price_msg,#stock_msg,#image_msg").text("");
+    $("#prodAlert").addClass("d-none");
 
     const name = $("#name").val().trim();
     const price = $("#price").val().trim();
     const stock = $("#stock").val().trim();
     const category_slug = $("#category_slug").val();
-    const image = $("#image").val().trim();
     const description = $("#description").val().trim();
     const is_active = $("#is_active").val();
+    const file = $("#image")[0].files[0] || null;
 
     let err = 0;
 
@@ -110,33 +127,39 @@ $(function(){
 
     if(err > 0) return;
 
+    let fd = new FormData();
+    fd.append("action", "add_product");
+    fd.append("name", name);
+    fd.append("price", price);
+    fd.append("stock", stock);
+    fd.append("category_slug", category_slug);
+    fd.append("description", description);
+    fd.append("is_active", is_active);
+    if (file) fd.append("image", file);
+
     $.ajax({
       type: "POST",
       url: "/e-pharma/public/ajax/ajax_admin_product.php",
+      data: fd,
+      processData: false,
+      contentType: false,
       dataType: "json",
-      data: {
-        action: "add_product",
-        name: name,
-        price: price,
-        stock: stock,
-        category_slug: category_slug,
-        image: image,
-        description: description,
-        is_active: is_active
-      },
       success: function(res){
-        alert(res.message);
+        showProdAlert(res.message, res.status === "success" ? "success" : "danger");
         if(res.status === "success"){
-          window.location.href = "/e-pharma/public/admin/products.php";
+          setTimeout(function(){
+            window.location.href = "/e-pharma/public/admin/products.php";
+          }, 900);
         }
       },
       error: function(xhr){
         console.log(xhr.responseText);
-        alert("Server error");
+        showProdAlert("Server error", "danger");
       }
     });
   });
 });
 </script>
+
 ';
 include_once __DIR__ . '/../../includes/admin/footer.php';

@@ -93,19 +93,28 @@ $cart_count = cart_count_items($conn, $user_id);
             <span class="fs-4">E-Pharma</span>
         </a>
 
-<!--        <form class="col-12 col-lg-auto mb-3 mb-lg-0">-->
-<!--            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">-->
-<!--        </form>-->
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="GET" action="/e-pharma/public/products.php">
-            <input
-                    type="search"
-                    class="form-control"
-                    name="q"
-                    placeholder="Search products..."
-                    aria-label="Search"
-                    value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
-            >
-        </form>
+        <?php
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        if (!in_array($path, [
+                '/e-pharma/public/about.php',
+                '/e-pharma/public/my_cart.php',
+                 '/e-pharma/public/user/profile.php',
+                 '/e-pharma/public/login.php'
+        ])):
+            ?>
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="GET" action="/e-pharma/public/products.php">
+                <input
+                        type="search"
+                        class="form-control"
+                        name="q"
+                        placeholder="Search products..."
+                        aria-label="Search"
+                        value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                >
+            </form>
+
+        <?php endif; ?>
+
 
     </div>
 </header>

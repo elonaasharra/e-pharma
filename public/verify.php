@@ -35,5 +35,7 @@ $ru = mysqli_query($conn, $u);
 if (!$ru) {
     die("DB error: " . mysqli_error($conn));
 }
-
-echo "Email verified successfully. You can login now.";
+//
+//echo "Email verified successfully. You can login now.";
+header("Location: /e-pharma/public/login.php?verified=1");
+exit;

@@ -19,6 +19,44 @@ function server_error($msg, $details = '') {
     exit;
 }
 
+/**
+ * Upload image (optional). Returns public path like /e-pharma/public/uploads/xxx.jpg
+ */
+function handle_optional_image_upload() {
+    if (empty($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        return null; // no file uploaded
+    }
+
+    $tmp  = $_FILES['image']['tmp_name'];
+    $size = (int)($_FILES['image']['size'] ?? 0);
+
+    if ($size <= 0) bad_request("Invalid image upload");
+    if ($size > 3 * 1024 * 1024) bad_request("Image too large (max 3MB)");
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = $finfo ? finfo_file($finfo, $tmp) : '';
+    if ($finfo) finfo_close($finfo);
+
+    $allowed = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp'
+    ];
+    if (!isset($allowed[$mime])) bad_request("Invalid image type (jpg/png/webp)");
+
+    $dirFs = __DIR__ . '/../uploads/';
+    if (!is_dir($dirFs)) {
+        if (!@mkdir($dirFs, 0755, true)) server_error("Cannot create uploads directory");
+    }
+
+    $filename = 'p_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $allowed[$mime];
+    $destFs = $dirFs . $filename;
+
+    if (!move_uploaded_file($tmp, $destFs)) server_error("Upload failed");
+
+    return '/e-pharma/public/uploads/' . $filename;
+}
+
 if ($action === 'disable_product') {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) bad_request("Invalid product id");
@@ -50,7 +88,6 @@ if ($action === 'add_product') {
     $price = trim($_POST['price'] ?? '');
     $stock = trim($_POST['stock'] ?? '0');
     $category_slug = trim($_POST['category_slug'] ?? '');
-    $image = trim($_POST['image'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $is_active = (int)($_POST['is_active'] ?? 1);
 
@@ -63,7 +100,13 @@ if ($action === 'add_product') {
     $stock_i = (int)$stock;
     $is_active = ($is_active === 1) ? 1 : 0;
 
-    // sold_count le te jete 0, created_at default
+    // ✅ optional image upload
+    $image = '';
+    $uploadedPath = handle_optional_image_upload();
+    if ($uploadedPath !== null) {
+        $image = $uploadedPath;
+    }
+
     $stmt = mysqli_prepare($conn, "
         INSERT INTO products (name, description, price, stock, category_slug, image, is_active, sold_count)
         VALUES (?, ?, ?, ?, ?, ?, ?, 0)
@@ -90,7 +133,6 @@ if ($action === 'update_product') {
     $price = trim($_POST['price'] ?? '');
     $stock = trim($_POST['stock'] ?? '0');
     $category_slug = trim($_POST['category_slug'] ?? '');
-    $image = trim($_POST['image'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $is_active = (int)($_POST['is_active'] ?? 1);
 
@@ -102,6 +144,22 @@ if ($action === 'update_product') {
     $price_f = (float)$price;
     $stock_i = (int)$stock;
     $is_active = ($is_active === 1) ? 1 : 0;
+
+    // ✅ keep existing image by default
+    $image = '';
+    $stmt0 = mysqli_prepare($conn, "SELECT image FROM products WHERE id=? LIMIT 1");
+    mysqli_stmt_bind_param($stmt0, "i", $id);
+    mysqli_stmt_execute($stmt0);
+    $r0 = mysqli_stmt_get_result($stmt0);
+    $old = $r0 ? mysqli_fetch_assoc($r0) : null;
+    mysqli_stmt_close($stmt0);
+    $image = $old['image'] ?? '';
+
+    // ✅ if new file uploaded, replace
+    $uploadedPath = handle_optional_image_upload();
+    if ($uploadedPath !== null) {
+        $image = $uploadedPath;
+    }
 
     $stmt = mysqli_prepare($conn, "
         UPDATE products

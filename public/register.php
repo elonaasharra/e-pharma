@@ -4,6 +4,7 @@
     <div class="register-wrapper" style="max-width:520px; width:100%;">
 
         <h3 class="mb-4 text-center">Create Account</h3>
+        <div id="registerAlert" class="alert d-none" role="alert"></div>
 
         <form id="registerForm" novalidate  >
 
