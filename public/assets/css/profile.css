@@ -1,0 +1,27 @@
+.profile-card {
+    border-radius: 14px;
+}
+
+.profile-photo {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid #eee;
+}
+
+.profile-photo-placeholder {
+    width: 160px;
+    height: 160px;
+    border-radius: 14px;
+    border: 1px dashed #bbb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    background: #fafafa;
+}
+
+.profile-lines p {
+    margin: 0 0 8px 0;
+}

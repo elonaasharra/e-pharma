@@ -1,11 +1,41 @@
 <?php
 require_once __DIR__ . '/../includes/session.php';
-if (isset($_SESSION["user_id"])) {
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/remember_me.php';
+/** @var mysqli $conn */
+
+rememberMeAutoLogin($conn);
+// Nëse është admin, dërgoje te dashboard-i i adminit
+if (isset($_SESSION["role_id"]) && (int)$_SESSION["role_id"] === 2) {
+    header("Location: /e-pharma/public/admin/dashboard.php");
+    exit;
+}
+
+elseif (isset($_SESSION["user_id"])) {
     include_once __DIR__ . '/../includes/login/header.php';
 } else {
     include_once __DIR__ . '/../includes/no_login/header.php';
 }
 ?>
+<?php
+// ================= BEST SELLERS =================
+$bestSql = "
+    SELECT id, name, description, price, image, sold_count
+    FROM products
+    WHERE is_active = 1
+    ORDER BY sold_count DESC
+    LIMIT 3
+";
+$bestRes = mysqli_query($conn, $bestSql);
+$bestProducts = [];
+
+if ($bestRes) {
+    while ($row = mysqli_fetch_assoc($bestRes)) {
+        $bestProducts[] = $row;
+    }
+}
+?>
+
 
 
 
@@ -195,6 +225,7 @@ if (isset($_SESSION["user_id"])) {
             </a>
         </div>
 </section>
+<!--bestsellers nga databaza-->
 <section class="best-sellers py-5">
     <div class="container">
 
@@ -211,106 +242,54 @@ if (isset($_SESSION["user_id"])) {
 
         <div class="row g-4 row-cols-2 row-cols-md-3 row-cols-xl-4">
 
-            <!-- Product 1 -->
-            <div class="col">
-                <div class="bs-card position-relative">
-<!--                    <span class="bs-badge">Best Seller</span>-->
+            <?php if (empty($bestProducts)): ?>
+                <div class="col-12">
+                    <p class="text-muted">Nuk ka ende produkte best seller.</p>
+                </div>
+            <?php endif; ?>
 
-                    <div class="bs-thumb">
-                        <img src="/e-pharma/public/assets/images/bestsellers/cerave.webp" alt="CeraVe Hydrating Cleanser">
-                    </div>
+            <?php foreach ($bestProducts as $p): ?>
+                <div class="col">
+                    <div class="bs-card position-relative">
 
-                    <div class="p-3">
-                        <h5 class="bs-title">CeraVe Hydrating Cleanser</h5>
-                        <p class="bs-desc">Pastrues hidratues për lëkurë normale–të thatë.</p>
+                        <div class="bs-thumb">
+                            <img
+                                    src="<?php echo htmlspecialchars($p['image']); ?>"
+                                    alt="<?php echo htmlspecialchars($p['name']); ?>"
+                            >
+                        </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="bs-price">1,990 Lek</div>
-                            <div class="btn-group">
-                                <a href="/e-pharma/public/product.php?id=1" class="btn btn-sm btn-outline-secondary">Shiko</a>
-                                <a href="/e-pharma/public/cart_add.php?id=1" class="btn btn-sm btn-primary">Shto</a>
+                        <div class="p-3">
+                            <h5 class="bs-title"><?php echo htmlspecialchars($p['name']); ?></h5>
+                            <p class="bs-desc"><?php echo htmlspecialchars($p['description']); ?></p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="bs-price">
+                                    <?php echo number_format((float)$p['price'], 0); ?> Lek
+                                </div>
+
+                                <div class="btn-group">
+                                    <a href="/e-pharma/public/product.php?id=<?php echo (int)$p['id']; ?>"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        Shiko
+                                    </a>
+
+                                    <a href="#"
+                                       class="btn btn-sm btn-primary js-add-to-cart"
+                                       data-product-id="<?php echo (int)$p['id']; ?>">
+                                        Shto
+                                    </a>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Product 2 -->
-            <div class="col">
-                <div class="bs-card position-relative">
-<!--                    <span class="bs-badge">Top</span>-->
-
-                    <div class="bs-thumb">
-                        <img src="/e-pharma/public/assets/images/bestsellers/nuxe.webp" alt="Nuxe Huile Prodigieuse">
-                    </div>
-
-                    <div class="p-3">
-                        <h5 class="bs-title">Nuxe Huile Prodigieuse</h5>
-                        <p class="bs-desc">Vaj multi-funksional për trup, fytyrë dhe flokë.</p>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="bs-price">2,490 Lek</div>
-                            <div class="btn-group">
-                                <a href="/e-pharma/public/product.php?id=2" class="btn btn-sm btn-outline-secondary">Shiko</a>
-                                <a href="/e-pharma/public/cart_add.php?id=2" class="btn btn-sm btn-primary">Shto</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 3 -->
-            <div class="col">
-                <div class="bs-card position-relative">
-<!--                    <span class="bs-badge">Best Seller</span>-->
-
-                    <div class="bs-thumb">
-                        <img src="/e-pharma/public/assets/images/bestsellers/vitaminC.webp" alt="Vitamin C">
-                    </div>
-
-                    <div class="p-3">
-                        <h5 class="bs-title">Vitamin C 1000mg</h5>
-                        <p class="bs-desc">Suplement për imunitet dhe energji ditore.</p>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="bs-price">890 Lek</div>
-                            <div class="btn-group">
-                                <a href="/e-pharma/public/product.php?id=3" class="btn btn-sm btn-outline-secondary">Shiko</a>
-                                <a href="/e-pharma/public/cart_add.php?id=3" class="btn btn-sm btn-primary">Shto</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 4 -->
-            <div class="col">
-                <div class="bs-card position-relative">
-<!--                    <span class="bs-badge">Top</span>-->
-
-                    <div class="bs-thumb">
-                        <img src="/e-pharma/public/assets/images/bestsellers/baby.webp" alt="Baby product">
-                    </div>
-
-                    <div class="p-3">
-                        <h5 class="bs-title">Baby Care Lotion</h5>
-                        <p class="bs-desc">Locion i butë për hidratim dhe kujdes ditor.</p>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="bs-price">1,290 Lek</div>
-                            <div class="btn-group">
-                                <a href="/e-pharma/public/product.php?id=4" class="btn btn-sm btn-outline-secondary">Shiko</a>
-                                <a href="/e-pharma/public/cart_add.php?id=4" class="btn btn-sm btn-primary">Shto</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach; ?>
 
         </div>
     </div>
 </section>
-
 
 
 <?php

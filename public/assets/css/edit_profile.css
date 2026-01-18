@@ -1,0 +1,9 @@
+.edit-profile-card {
+    max-width: 600px;
+    margin: auto;
+    border-radius: 14px;
+}
+
+.edit-profile-page h3 {
+    font-weight: 600;
+}

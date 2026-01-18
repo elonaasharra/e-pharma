@@ -48,5 +48,19 @@
 <script src="/e-pharma/public/assets/js/register.js"></script>
 <script src="/e-pharma/public/assets/js/login.js"></script>
 
+<?php
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$pages_need_cart = [
+        '/e-pharma/public/products.php',
+        '/e-pharma/public/index.php',
+        '/e-pharma/public/my_cart.php',
+];
+
+if (in_array($path, $pages_need_cart, true)) {
+    echo '<script src="/e-pharma/public/assets/js/cart.js"></script>';
+}
+?>
+
 </body>
 </html>

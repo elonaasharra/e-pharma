@@ -1,43 +1,55 @@
-// public/assets/js/cart.js
+$(function () {
 
-document.addEventListener("click", async (e) => {
-    const btn = e.target.closest("[data-add-to-cart]");
-    if (!btn) return;
+    // Butoni "Shto në shportë" duhet të ketë class .js-add-to-cart
+    // dhe atribut: data-product-id="123"
+    $(document).on("click", ".js-add-to-cart", function (e) {
+        e.preventDefault();
 
-    const productId = btn.getAttribute("data-product-id");
-    const qtyInputSelector = btn.getAttribute("data-qty-input"); // opsionale
-    let qty = 1;
+        var pid = parseInt($(this).data("product-id"), 10);
+        if (!pid) return;
 
-    if (qtyInputSelector) {
-        const qtyEl = document.querySelector(qtyInputSelector);
-        if (qtyEl) qty = parseInt(qtyEl.value || "1", 10);
-    }
+        $.ajax({
+            type: "POST",
+            url: "/e-pharma/public/ajax/ajax_cart_add.php",
+            data: { action: "add", product_id: pid, qty: 1 },
+            dataType: "json",
+            success: function (res) {
+                if (res && res.ok) {
+                    if (typeof res.cart_count !== "undefined") {
+                        $("#cart-count").text(res.cart_count);
+                    }
+                    // opsionale
+                    // alert("U shtua në shportë!");
+                } else {
+                    // nëse s’je logged in → login
+                    if (res && (res.error === "Not logged in" || res.message === "Not logged in")) {
+                        window.location.href = "/e-pharma/public/login.php";
+                        return;
+                    }
+                    alert((res && (res.error || res.message)) ? (res.error || res.message) : "Nuk u shtua në shportë.");
+                }
+            },
+            error: function (xhr) {
+                // nëse backend kthen 401
+                if (xhr.status === 401) {
+                    window.location.href = "/e-pharma/public/login.php";
+                    return;
+                }
 
-    const formData = new FormData();
-    formData.append("product_id", productId);
-    formData.append("qty", qty);
+                // ✅ FIX për rastin tënd: serveri kthen 302 redirect te login.php
+                // jQuery e quan "parsererror" sepse priste JSON dhe mori HTML
+                if (
+                    (xhr.status === 302) ||
+                    (xhr.responseURL && xhr.responseURL.indexOf("login.php") !== -1) ||
+                    (xhr.responseText && xhr.responseText.toLowerCase().indexOf("<html") !== -1)
+                ) {
+                    window.location.href = "/e-pharma/public/login.php";
+                    return;
+                }
 
-    try {
-        const res = await fetch("/e-pharma/public/ajax/ajax_cart_add.php", {
-            method: "POST",
-            body: formData,
-            credentials: "same-origin",
+                alert("AJAX error");
+            }
         });
+    });
 
-        const data = await res.json();
-
-        if (!data.ok) {
-            alert(data.error || "Ndodhi një gabim.");
-            return;
-        }
-
-        // Përditëso badge-in në header
-        const badge = document.getElementById("cart-count");
-        if (badge) badge.textContent = data.cart_count;
-
-        alert("Produkti u shtua në shportë ✅");
-    } catch (err) {
-        console.error(err);
-        alert("Problem me serverin / rrjetin.");
-    }
 });

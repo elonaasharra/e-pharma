@@ -1,107 +1,93 @@
 <?php
-include_once __DIR__ . '/../../includes/login/header.php';
-
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/db.php';
 /** @var mysqli $conn */
 
+include_once __DIR__ . '/../../includes/login/header.php';
+
 $user_id = (int)$_SESSION["user_id"];
 
-$r = mysqli_query($conn, "SELECT name, surname, email, profile_photo FROM users WHERE id=".$user_id." LIMIT 1");
+$r = mysqli_query(
+        $conn,
+        "SELECT name, surname, email, profile_photo
+     FROM users
+     WHERE id = $user_id
+     LIMIT 1"
+);
+
 $user = mysqli_fetch_assoc($r);
-if (!$user) { die("User not found"); }
+if (!$user) {
+    die("User not found");
+}
 ?>
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Edit Profile</title></head>
-<body>
 
-<h3>Edit Profile</h3>
+    <div class="container py-4 edit-profile-page">
 
-<form id="editProfileForm" enctype="multipart/form-data">
-    <div>
-        <label>Name</label><br>
-        <input type="text" name="name" id="name" value="<?php echo htmlspecialchars($user["name"]); ?>">
-        <span id="name_message" style="color:red;"></span>
-    </div><br>
+        <div class="card shadow-sm edit-profile-card">
+            <div class="card-body">
 
-    <div>
-        <label>Surname</label><br>
-        <input type="text" name="surname" id="surname" value="<?php echo htmlspecialchars($user["surname"]); ?>">
-        <span id="surname_message" style="color:red;"></span>
-    </div><br>
+                <h3 class="mb-3">Edit Profile</h3>
 
-    <div>
-        <label>Email (read-only)</label><br>
-        <input type="email" value="<?php echo htmlspecialchars($user["email"]); ?>" readonly>
-    </div><br>
+                <form id="editProfileForm" enctype="multipart/form-data">
 
-    <div>
-        <label>Profile photo</label><br>
-        <input type="file" name="photo" id="photo" accept="image/*">
-    </div><br>
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="name"
+                                id="name"
+                                value="<?php echo htmlspecialchars($user["name"]); ?>"
+                        >
+                        <div id="name_message" class="text-danger small"></div>
+                    </div>
 
-    <button type="submit">Save</button>
-</form>
+                    <div class="mb-3">
+                        <label class="form-label">Surname</label>
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="surname"
+                                id="surname"
+                                value="<?php echo htmlspecialchars($user["surname"]); ?>"
+                        >
+                        <div id="surname_message" class="text-danger small"></div>
+                    </div>
 
-<p><a href="/e-pharma/public/user/profile.php">Back to profile</a></p>
+                    <div class="mb-3">
+                        <label class="form-label">Email (read-only)</label>
+                        <input
+                                type="email"
+                                class="form-control"
+                                value="<?php echo htmlspecialchars($user["email"]); ?>"
+                                readonly
+                        >
+                    </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <div class="mb-3">
+                        <label class="form-label">Profile photo</label>
+                        <input
+                                type="file"
+                                class="form-control"
+                                name="photo"
+                                id="photo"
+                                accept="image/*"
+                        >
+                    </div>
 
-<script>
-    $(function () {
-        $("#editProfileForm").on("submit", function(e){
-            e.preventDefault();
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a href="/e-pharma/public/user/profile.php" class="btn btn-outline-secondary">
+                            Back to profile
+                        </a>
+                    </div>
 
-            var name = $("#name").val().trim();
-            var surname = $("#surname").val().trim();
-            var alpha = /^[a-zA-Z]{2,40}$/;
-            var error = 0;
+                </form>
 
-            $("#name_message").text(""); $("#surname_message").text("");
+            </div>
+        </div>
 
-            if (!alpha.test(name)) { $("#name_message").text("Invalid name"); error++; }
-            if (!alpha.test(surname)) { $("#surname_message").text("Invalid surname"); error++; }
-            if (error>0) return;
-
-            var data = new FormData(this);
-            data.append("action","update_profile");
-
-            $.ajax({
-                type: "POST",
-                url: "/e-pharma/public/ajax/ajax_update_profile.php",
-                data: data,
-                processData: false,
-                contentType: false,
-                dataType: "json",
-                success: function(res){
-                    alert(res.message);
-                    // if(res.location){ window.location.href = res.location; }
-                },
-                error: function(){
-                    alert("AJAX error");
-                }
-                // success: function(res){
-                //     try {
-                //         if (typeof res === "string") res = JSON.parse(res);
-                //     } catch (e) {
-                //         console.log("Not JSON response:", res);
-                //         alert("Server returned non-JSON. Check console.");
-                //         return;
-                //     }
-                //
-                //     alert(res.message);
-                //     if(res.location){ window.location.href = res.location; }
-                // },
-                // error: function(xhr){
-                //     console.log(xhr.responseText);
-                //     alert("AJAX error");
-                // }
-
-            });
-        });
-    });
-</script>
+    </div>
 
 <?php
 include_once __DIR__ . '/../../includes/login/footer.php';

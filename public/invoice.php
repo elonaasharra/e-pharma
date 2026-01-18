@@ -5,7 +5,7 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/login/header.php';
 /** @var mysqli $conn */
 
-$user_id = (int)$_SESSION['user_id'];
+$user_id  = (int)$_SESSION['user_id'];
 $order_id = (int)($_GET['order_id'] ?? 0);
 
 if ($order_id <= 0) {
@@ -48,11 +48,22 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $res = $stmt->get_result();
-$items = [];
-while ($row = $res->fetch_assoc()) $items[] = $row;
 
-// Totali nga DB (prefero order.total_amount nëse e ke)
-$total_amount = isset($order['total_amount']) ? (float)$order['total_amount'] : 0.0;
+$items = [];
+while ($row = $res->fetch_assoc()) {
+    $items[] = $row;
+}
+
+// TOTAL nga order_items (sepse te ti nuk ka orders.total_amount)
+$total_amount = 0.0;
+foreach ($items as $it) {
+    // nëse ke line_total në order_items, përdore atë (më e sakta)
+    if (isset($it['line_total'])) {
+        $total_amount += (float)$it['line_total'];
+    } else {
+        $total_amount += (float)($it['unit_price'] ?? 0) * (int)($it['quantity'] ?? 0);
+    }
+}
 ?>
 
 <div class="container mt-4" id="invoice">
@@ -72,8 +83,11 @@ $total_amount = isset($order['total_amount']) ? (float)$order['total_amount'] : 
 
     <div class="mb-3">
         <div><strong>Klienti (User ID):</strong> <?php echo (int)$order['user_id']; ?></div>
-        <?php if (!empty($order['paypal_order_id'])): ?>
-            <div><strong>PayPal Order:</strong> <?php echo htmlspecialchars($order['paypal_order_id']); ?></div>
+
+        <?php
+        // te orders ti ke provider_order_id, jo paypal_order_id
+        if (!empty($order['provider_order_id'])): ?>
+            <div><strong>PayPal Order:</strong> <?php echo htmlspecialchars($order['provider_order_id']); ?></div>
         <?php endif; ?>
     </div>
 
@@ -90,7 +104,9 @@ $total_amount = isset($order['total_amount']) ? (float)$order['total_amount'] : 
         <?php foreach ($items as $it):
             $price = (float)($it['unit_price'] ?? 0);
             $qty   = (int)($it['quantity'] ?? 0);
-            $line  = $price * $qty;
+
+            // nëse line_total ekziston, përdore
+            $line = isset($it['line_total']) ? (float)$it['line_total'] : ($price * $qty);
             ?>
             <tr>
                 <td><?php echo htmlspecialchars($it['product_name'] ?? ('Product #' . (int)$it['product_id'])); ?></td>

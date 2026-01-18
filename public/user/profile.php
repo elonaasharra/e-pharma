@@ -1,19 +1,15 @@
 <?php
-include_once __DIR__ . '/../../includes/login/header.php';
-
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/db.php';
 /** @var mysqli $conn */
-if (isset($_GET["id"])) {
-    header("Location: /e-pharma/public/user/profile.php");
-    exit;
-}
+
+include_once __DIR__ . '/../../includes/login/header.php';
 
 $user_id = (int)$_SESSION["user_id"];
 
 $q = "SELECT name, surname, email, role_id, profile_photo
       FROM users
-      WHERE id = ".$user_id."
+      WHERE id = $user_id
       LIMIT 1";
 $r = mysqli_query($conn, $q);
 
@@ -26,39 +22,50 @@ if (!$user) {
     die("User not found");
 }
 ?>
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>My Profile</title>
-</head>
-<body>
 
-<h3>Profile (PRIVATE)</h3>
+    <div class="container py-4 profile-page">
 
-<p><b>Name:</b> <?php echo htmlspecialchars($user["name"]); ?></p>
-<p><b>Surname:</b> <?php echo htmlspecialchars($user["surname"]); ?></p>
-<p><b>Email:</b> <?php echo htmlspecialchars($user["email"]); ?></p>
-<p><b>Role ID:</b> <?php echo (int)$user["role_id"]; ?></p>
+        <div class="card shadow-sm profile-card">
+            <div class="card-body">
 
-<p><b>Profile photo:</b><br>
-    <?php if (!empty($user["profile_photo"])): ?>
-        <img src="/e-pharma/public/uploads/<?php echo htmlspecialchars($user["profile_photo"]); ?>"
-             width="150" alt="Profile Photo">
-    <?php else: ?>
-        No photo
-    <?php endif; ?>
-</p>
+                <div class="d-flex flex-column flex-md-row gap-4 align-items-start">
 
-<hr>
+                    <div class="profile-photo-wrap">
+                        <?php if (!empty($user["profile_photo"])): ?>
+                            <img
+                                    class="profile-photo"
+                                    src="/e-pharma/public/uploads/<?php echo htmlspecialchars($user["profile_photo"]); ?>"
+                                    alt="Profile Photo"
+                            >
+                        <?php else: ?>
+                            <div class="profile-photo-placeholder">
+                                No photo
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-<p>
-    <a href="/e-pharma/public/user/edit_profile.php">Edit Profile</a>
-</p>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-3">My Profile</h3>
 
-<p>
-    <a href="/e-pharma/public/logout.php">Logout</a>
-</p>
+                        <div class="profile-lines">
+                            <p><b>Name:</b> <?php echo htmlspecialchars($user["name"]); ?></p>
+                            <p><b>Surname:</b> <?php echo htmlspecialchars($user["surname"]); ?></p>
+                            <p><b>Email:</b> <?php echo htmlspecialchars($user["email"]); ?></p>
+                            <p><b>Role ID:</b> <?php echo (int)$user["role_id"]; ?></p>
+                        </div>
+
+                        <div class="mt-3 d-flex gap-2 flex-wrap">
+                            <a class="btn btn-primary" href="/e-pharma/public/user/edit_profile.php">Edit Profile</a>
+                            <a class="btn btn-outline-danger" href="/e-pharma/public/logout.php">Logout</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 
 <?php
 include_once __DIR__ . '/../../includes/login/footer.php';

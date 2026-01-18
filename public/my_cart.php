@@ -4,8 +4,9 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/cart.php';
 require_once __DIR__ . '/../includes/login/header.php';
-
 /** @var mysqli $conn */
+
+
 $user_id = (int)$_SESSION["user_id"];
 $items = cart_get_items($conn, $user_id);
 $total = cart_get_total($conn, $user_id);

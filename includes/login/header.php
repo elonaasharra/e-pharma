@@ -24,9 +24,20 @@ $cart_count = cart_count_items($conn, $user_id);
 
     <!-- Local CSS -->
     <link rel="stylesheet" href="/e-pharma/public/assets/css/register.css">
+<!--    sepse perdorim modelin e njejt-->
     <link rel="stylesheet" href="/e-pharma/public/assets/css/header_nologin.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/footer_nologin.css">
     <link rel="stylesheet" href="/e-pharma/public/assets/css/index.css">
+    <?php
+    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if ($path === '/e-pharma/public/user/profile.php') {
+        echo '<link rel="stylesheet" href="/e-pharma/public/assets/css/profile.css">';
+    }
+    if ($path === '/e-pharma/public/user/edit_profile.php') {
+        echo '<link rel="stylesheet" href="/e-pharma/public/assets/css/edit_profile.css">';
+    }
+    ?>
+
 </head>
 <body>
 
@@ -50,14 +61,14 @@ $cart_count = cart_count_items($conn, $user_id);
             </li>
 
             <li class="nav-item">
-                <a href="#" class="nav-link link-dark px-2">About</a>
+                <a href="/e-pharma/public/about.php" class="nav-link link-dark px-2">About</a>
             </li>
-
-            <?php if ((int)($_SESSION["role_id"] ?? 0) === 2): ?>
-                <li class="nav-item">
-                    <a href="/e-pharma/public/admin/users.php" class="nav-link link-dark px-2">Admin</a>
-                </li>
-            <?php endif; ?>
+<!-- nese dum qe admini ta shofi si user-->
+<!--            --><?php //if ((int)($_SESSION["role_id"] ?? 0) === 2): ?>
+<!--                <li class="nav-item">-->
+<!--                    <a href="/e-pharma/public/admin/users.php" class="nav-link link-dark px-2">Admin</a>-->
+<!--                </li>-->
+<!--            --><?php //endif; ?>
         </ul>
 
         <ul class="nav">
@@ -82,8 +93,19 @@ $cart_count = cart_count_items($conn, $user_id);
             <span class="fs-4">E-Pharma</span>
         </a>
 
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0">
-            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+<!--        <form class="col-12 col-lg-auto mb-3 mb-lg-0">-->
+<!--            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">-->
+<!--        </form>-->
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="GET" action="/e-pharma/public/products.php">
+            <input
+                    type="search"
+                    class="form-control"
+                    name="q"
+                    placeholder="Search products..."
+                    aria-label="Search"
+                    value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+            >
         </form>
+
     </div>
 </header>

@@ -24,8 +24,8 @@
     <div class="container d-flex flex-wrap">
         <ul class="nav me-auto">
             <li class="nav-item"><a href="/e-pharma/public/index.php" class="nav-link link-dark px-2 active">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">Products</a></li>
-            <li class="nav-item"><a href="#" class="nav-link link-dark px-2">About</a></li>
+            <li class="nav-item"><a href="/e-pharma/public/products.php" class="nav-link link-dark px-2">Products</a></li>
+            <li class="nav-item"><a href="/e-pharma/public/about.php" class="nav-link link-dark px-2">About</a></li>
         </ul>
         <ul class="nav">
             <li class="nav-item"><a href="login.php" class="nav-link link-dark px-2">Login</a></li>
@@ -39,9 +39,20 @@
         <a href="/e-pharma/public/index.php" class="d-flex align-items-center mb-3 mb-lg-0 me-lg-auto text-dark text-decoration-none">
             <span class="fs-4">E-Pharma</span>
         </a>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0">
-            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+<!--        <form class="col-12 col-lg-auto mb-3 mb-lg-0">-->
+<!--            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">-->
+<!--        </form>-->
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="GET" action="/e-pharma/public/products.php">
+            <input
+                    type="search"
+                    class="form-control"
+                    name="q"
+                    placeholder="Search products..."
+                    aria-label="Search"
+                    value="<?php echo htmlspecialchars($_GET['q'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+            >
         </form>
+
     </div>
 </header>
 

@@ -8,7 +8,6 @@ require_once __DIR__ . '/db.php';
  */
 function cart_get_or_create_active(mysqli $conn, int $user_id): int
 {
-    // Kërko cart aktiv
     $sql = "SELECT id FROM carts WHERE user_id = ? AND status = 'active' LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $user_id);
@@ -18,7 +17,6 @@ function cart_get_or_create_active(mysqli $conn, int $user_id): int
         return (int)$row['id'];
     }
 
-    // Krijo cart të ri aktiv
     $sql = "INSERT INTO carts (user_id, status) VALUES (?, 'active')";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $user_id);
@@ -31,6 +29,7 @@ function cart_get_or_create_active(mysqli $conn, int $user_id): int
  * Shto produkt në shportë.
  * - nëse ekziston rreshti (cart_id, product_id) => rrit quantity
  * - përndryshe => krijon rresht të ri
+ * RREGULLIM: kontroll stokun dhe mos lejo sasi > stok.
  */
 function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1): array
 {
@@ -38,7 +37,7 @@ function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1
 
     $cart_id = cart_get_or_create_active($conn, $user_id);
 
-    // Merre çmimin aktual nga products
+    // Merr çmimin + stok + aktiv nga products
     $sql = "SELECT price, stock, is_active FROM products WHERE id = ? LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $product_id);
@@ -54,6 +53,30 @@ function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1
     }
 
     $unit_price = (float)$p["price"];
+    $stock = (int)$p["stock"];
+
+    if ($stock <= 0) {
+        return ["ok" => false, "error" => "Nuk ka stok për këtë produkt."];
+    }
+
+    // Sa është aktualisht në shportë?
+    $sql = "SELECT quantity FROM cart_items WHERE cart_id = ? AND product_id = ? LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $cart_id, $product_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $row = $res->fetch_assoc();
+    $current_qty = $row ? (int)$row['quantity'] : 0;
+
+    // Sasia e re e kërkuar
+    $new_qty = $current_qty + $qty;
+
+    if ($new_qty > $stock) {
+        return [
+            "ok" => false,
+            "error" => "Sasia e kërkuar kalon stokun. Stok aktual: {$stock}, në shportë: {$current_qty}."
+        ];
+    }
 
     // Provo update (nëse ekziston)
     $sql = "UPDATE cart_items
@@ -86,7 +109,7 @@ function cart_remove_item(mysqli $conn, int $user_id, int $product_id): array
     $row = $res->fetch_assoc();
 
     if (!$row) {
-        return ["ok" => true]; // s'ka cart, s'ka ç'të fshijë
+        return ["ok" => true];
     }
 
     $cart_id = (int)$row["id"];
@@ -108,9 +131,7 @@ function cart_count_items(mysqli $conn, int $user_id): int
             WHERE c.user_id = ? AND c.status = 'active'";
 
     $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        return 0; // mos e prish header-in nqs ka problem me query/DB
-    }
+    if (!$stmt) return 0;
 
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -120,6 +141,7 @@ function cart_count_items(mysqli $conn, int $user_id): int
 
     return $row ? (int)$row["cnt"] : 0;
 }
+
 function cart_get_total(mysqli $conn, int $user_id): float
 {
     $sql = "SELECT COALESCE(SUM(ci.quantity * ci.unit_price), 0) AS total
@@ -137,6 +159,7 @@ function cart_get_total(mysqli $conn, int $user_id): float
 
     return $row ? (float)$row["total"] : 0.0;
 }
+
 function cart_get_items(mysqli $conn, int $user_id): array
 {
     $sql = "SELECT

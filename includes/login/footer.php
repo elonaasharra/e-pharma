@@ -51,6 +51,27 @@
 
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<?php
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+if ($path === '/e-pharma/public/user/edit_profile.php') {
+    echo '<script src="/e-pharma/public/assets/js/edit_profile.js"></script>';
+}
+if ($path === '/e-pharma/public/user/profile.php') {
+    echo '<script src="/e-pharma/public/assets/js/profile.js"></script>';
+}
+$pages_need_cart = [
+        '/e-pharma/public/products.php',
+        '/e-pharma/public/index.php',
+        '/e-pharma/public/my_cart.php',
+];
+
+if (in_array($path, $pages_need_cart, true)) {
+    echo '<script src="/e-pharma/public/assets/js/cart.js"></script>';
+}
+?>
 </body>
 </html>
+

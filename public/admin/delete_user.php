@@ -1,8 +1,10 @@
 <?php
+$page_title = "Delete User";
 
-require_once __DIR__ . '/../../includes/admin_auth.php';
 require_once __DIR__ . '/../../includes/db.php';
 /** @var mysqli $conn */
+
+include_once __DIR__ . '/../../includes/admin/header.php';
 
 $id = (int)($_GET["id"] ?? 0);
 if ($id <= 0) {
@@ -21,55 +23,62 @@ if (!$user) {
     die("User not found");
 }
 ?>
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Delete User</title>
-</head>
-<body>
 
-<h2>Delete User</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0 text-danger">Delete User</h2>
+        <a class="btn btn-outline-secondary" href="/e-pharma/public/admin/users.php">← Back</a>
+    </div>
 
-<p>Are you sure you want to delete this user?</p>
+    <div class="alert alert-warning">
+        <strong>Warning!</strong> This action cannot be undone.
+    </div>
 
-<ul>
-    <li><b>ID:</b> <?php echo (int)$user["id"]; ?></li>
-    <li><b>Name:</b> <?php echo htmlspecialchars($user["name"]); ?></li>
-    <li><b>Surname:</b> <?php echo htmlspecialchars($user["surname"]); ?></li>
-    <li><b>Email:</b> <?php echo htmlspecialchars($user["email"]); ?></li>
-    <li><b>Role ID:</b> <?php echo (int)$user["role_id"]; ?></li>
-</ul>
+    <div class="card shadow-sm border-danger">
+        <div class="card-body">
+            <p class="mb-3">Are you sure you want to delete this user?</p>
 
-<button id="btnDelete">Yes, delete</button>
-<a href="/e-pharma/public/admin/users.php">Cancel</a>
+            <ul class="list-group mb-4">
+                <li class="list-group-item"><b>ID:</b> <?php echo (int)$user["id"]; ?></li>
+                <li class="list-group-item"><b>Name:</b> <?php echo htmlspecialchars($user["name"]); ?></li>
+                <li class="list-group-item"><b>Surname:</b> <?php echo htmlspecialchars($user["surname"]); ?></li>
+                <li class="list-group-item"><b>Email:</b> <?php echo htmlspecialchars($user["email"]); ?></li>
+                <li class="list-group-item"><b>Role ID:</b> <?php echo (int)$user["role_id"]; ?></li>
+            </ul>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $("#btnDelete").on("click", function(){
-        if(!confirm("This action cannot be undone. Continue?")) return;
+            <div class="d-flex gap-2">
+                <button id="btnDelete" class="btn btn-danger">Yes, delete</button>
+                <a href="/e-pharma/public/admin/users.php" class="btn btn-light">Cancel</a>
+            </div>
+        </div>
+    </div>
+<?php
+$page_scripts = '
+    <script>
+        $("#btnDelete").on("click", function(){
+            if(!confirm("This action cannot be undone. Continue?")) return;
 
-        $.ajax({
-            type: "POST",
-            url: "/e-pharma/public/ajax/ajax_admin_user.php",
-            dataType: "json",
-            data: {
-                action: "delete_user",
-                id: <?php echo (int)$user["id"]; ?>
-            },
-            success: function(res){
-                alert(res.message);
-                if(res.status === "success"){
-                    window.location.href = "/e-pharma/public/admin/users.php";
+            $.ajax({
+                type: "POST",
+                url: "/e-pharma/public/ajax/ajax_admin_user.php",
+                dataType: "json",
+                data: {
+                    action: "delete_user",
+                    id: <?php echo (int)$user["id"]; ?>
+                },
+                success: function(res){
+                    alert(res.message);
+                    if(res.status === "success"){
+                        window.location.href = "/e-pharma/public/admin/users.php";
+                    }
+                },
+                error: function(xhr){
+                    console.log(xhr.responseText);
+                    alert("Server error");
                 }
-            },
-            error: function(xhr){
-                console.log(xhr.responseText);
-                alert("Server error");
-            }
+            });
         });
-    });
-</script>
+    </script>
+'?>
 
-</body>
-</html>
+<?php
+include_once __DIR__ . '/../../includes/admin/footer.php';
