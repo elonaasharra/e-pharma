@@ -2,11 +2,8 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/session.php';
 
-/**
- * Log për komunikime me palë të treta (PayPal, Stripe, etj.)
- * Compatible me PHP 5.6+
- */
-function log_third_party($data)
+//log per komunikime me pale te treta
+function log_third_party($data) // funksioni merr nje array data qe permban informacionet per logun
 {
     global $conn; // mysqli nga includes/db.php
 
@@ -22,7 +19,6 @@ function log_third_party($data)
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     $ip      = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
 
-    // Mos log-o sekrete (basic hygiene)
     // Nëse payload është array, bëje json
     if (is_array($request_payload))  $request_payload  = json_encode($request_payload, JSON_UNESCAPED_UNICODE);
     if (is_array($response_payload)) $response_payload = json_encode($response_payload, JSON_UNESCAPED_UNICODE);

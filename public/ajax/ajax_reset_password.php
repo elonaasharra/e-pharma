@@ -70,7 +70,7 @@ if (!$ru) {
 // sheno reset si i perdorur
 mysqli_query($conn, "UPDATE password_resets SET used_at = NOW() WHERE id = ".$reset_id);
 
-// opsionale: fshi remember_tokens qe user te logojë prap (siguri)
+// opsionale: fshi remember_tokens qe user te logoj prap
 mysqli_query($conn, "DELETE FROM remember_tokens WHERE user_id = ".$user_id);
 
 http_response_code(200);

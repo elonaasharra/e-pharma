@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . "/db.php";
+require_once __DIR__ . "/db.php"; // vetem nje here
 require_once __DIR__ . "/remember_me.php";
 
 /** @var mysqli $conn */
@@ -7,26 +7,27 @@ require_once __DIR__ . "/remember_me.php";
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-// 15 minuta (për test mund ta bësh 15 sekonda)
+// 15 minuta zgjatja e sesionit
 $timeout = 15*60 ;
 
-// 1) Nëse ka user në session dhe ka kaluar timeout → çlogo vetëm session-in
+//  Nese ka user ne session dhe ka kaluar timeout , çlogo vetem session-in
 if (isset($_SESSION["user_id"], $_SESSION["last_activity"])) {
     if (time() - (int)$_SESSION["last_activity"] > $timeout) {
-        unset($_SESSION["user_id"], $_SESSION["user_email"], $_SESSION["role_id"], $_SESSION["last_activity"]);
+        unset($_SESSION["user_id"], $_SESSION["user_email"], $_SESSION["role_id"], $_SESSION["last_activity"]);//useri nuk konsiderohet me i loguar
+
         if (session_status() === PHP_SESSION_ACTIVE) {
-            session_regenerate_id(true);
+            session_regenerate_id(true); // per te mbrojtur nga sulmet
         }
     }
 }
 
-// 2) Nëse s’ka user në session → provo remember me (vetëm nëse ekziston cookie)
+// Nese s’ka user ne session → provo remember me
 if (!isset($_SESSION["user_id"])) {
-    rememberMeAutoLogin($conn); // nëse s’punon, thjesht kthen false
+    rememberMeAutoLogin($conn); // nese s’punon, thjesht kthen false
+
 }
 
-// 3) Rifresko aktivitetin vetëm kur është i loguar
+//  Rifresko aktivitetin vetem kur eshte i loguar
 if (isset($_SESSION["user_id"])) {
     $_SESSION["last_activity"] = time();
 }

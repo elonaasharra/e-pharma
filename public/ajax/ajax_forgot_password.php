@@ -46,15 +46,14 @@ if ((int)$user["is_verified"] !== 1) {
     exit;
 }
 
-// krijo token (kompatibël me PHP të vjetër)
 $token = md5(uniqid(mt_rand(), true)) . md5(uniqid(mt_rand(), true));
 $token_hash = hash("sha256", $token);
 $expires_at = date("Y-m-d H:i:s", time() + 60*30); // 30 minuta
 
-// fshi reset-at e vjetër (opsionale)
+// fshi reset-at e vjeter
 mysqli_query($conn, "DELETE FROM password_resets WHERE user_id = ".$user["id"]." AND used_at IS NULL");
 
-// ruaje në DB
+// ruaje ne DB
 $ins = "INSERT INTO password_resets SET
     user_id = ".$user["id"].",
     token_hash = '".$token_hash."',
@@ -69,7 +68,7 @@ if (!$ri) {
     exit;
 }
 
-// dërgo email
+// dergo email
 $link = "http://localhost/e-pharma/public/reset_password.php?token=" . urlencode($token);
 
 $data = array(
@@ -79,7 +78,7 @@ $data = array(
     "type" => "reset_password"
 );
 
-// përdor mail.php – nëse s’e ke të përshtatur, e dërgojmë me Body të thjeshtë
+
 $sent = sendEmail(array(
     "user_email" => $user["email"],
     "token" => $token,

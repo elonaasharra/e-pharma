@@ -1,5 +1,4 @@
 $(document).ready(function () {
-//shtesa
     function showLoginAlert(msg, type) {
         // type: "success" | "danger" | "warning" | "info"
         $("#loginAlert")
@@ -7,14 +6,12 @@ $(document).ready(function () {
             .addClass("alert-" + type)
             .text(msg);
     }
-
+    //ne submit te formes ekzekutohet ky funksion
     $("#loginForm").on("submit", function (e) {
         e.preventDefault();
-
         let email = $("#login_email").val().trim();
         let password = $("#login_password").val();
         let remember = $("#remember_me").is(":checked") ? 1 : 0;
-
         let email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         let error = 0;
 
@@ -41,7 +38,7 @@ $(document).ready(function () {
 
         if (error > 0) return;
 
-        let data = new FormData();
+        let data = new FormData();//pergatisim te dhenat per dergim me objektin form data
         data.append("action", "login");
         data.append("email", email);
         data.append("password", password);
@@ -50,10 +47,10 @@ $(document).ready(function () {
         $.ajax({
             type: "POST",
             url: "ajax/ajax_login.php",
-            processData: false,
-            contentType: false,
+            processData: false,//qe tmos i kthejm te dhenat ne querystring
+            contentType: false,//ja vendos browseri automatikisht
             data: data,
-            dataType: "json",
+            dataType: "json",//Është një format për shkëmbim të dhënash midis browserit dhe serverit
             success: function (response) {
                 if (typeof response === "string") response = JSON.parse(response);
                 showLoginAlert(response.message || "Login success", "success");
@@ -65,7 +62,7 @@ $(document).ready(function () {
             },
             error: function (xhr) {
                 let msg = "AJAX error";
-                if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;//nese ekziston json dhe ka fushen message vtm ath e merr mesazhin
 
                 // 401/403/422/429 -> i shfaqim si danger/warning
                 if (xhr.status === 429) showLoginAlert(msg, "warning");

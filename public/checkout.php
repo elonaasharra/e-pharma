@@ -10,7 +10,6 @@ require_once __DIR__ . '/../includes/login/header.php';
 $user_id = (int)$_SESSION["user_id"];
 $total = cart_get_total($conn, $user_id);
 ?>
-
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -31,14 +30,12 @@ $total = cart_get_total($conn, $user_id);
                 </div>
             <?php else: ?>
                 <div id="paypal-buttons"></div>
-<!--                <pre id="out" class="mt-3 small"></pre>-->
             <?php endif; ?>
 
 
         </div>
     </div>
 </div>
-
 <?php require_once __DIR__ . '/../includes/login/footer.php'; ?>
 
 <!-- PayPal JS SDK (popup brenda faqes) -->
@@ -54,7 +51,6 @@ $total = cart_get_total($conn, $user_id);
             createOrder: async function () {
                 msg.innerHTML = "";
                 // out.textContent = "Creating order...";
-
                 const r = await fetch('/e-pharma/public/ajax/ajax_paypal_create_order.php', { method: 'POST' });
                 const j = await r.json();
 

@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/db.php';
 /** @var mysqli $conn */
 
 include_once __DIR__ . '/../../includes/login/header.php';
-//  Mos lejo adminin të hapë profilin e userit
+//nuk lejon adminin te hap profilin e userit
 if ((int)($_SESSION["role_id"] ?? 0) === 2) {
     header("Location: /e-pharma/public/admin/dashboard.php");
     exit;

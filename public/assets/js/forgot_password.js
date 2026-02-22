@@ -4,7 +4,6 @@ $(document).ready(function () {
 
         let email = $("#fp_email").val().trim();
         let email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
         $("#fp_email").removeClass("border-danger");
         $("#fp_email_message").text("");
 

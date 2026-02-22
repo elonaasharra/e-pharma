@@ -23,11 +23,11 @@ if ($total <= 0) {
     echo json_encode(['ok' => false, 'error' => 'Cart is empty']);
     exit;
 }
-
 $currency = 'EUR'; // ose 'ALL' sipas projektit
 
-$return_url = 'http://localhost/e-pharma/public/paypal_return.php';
-$cancel_url = 'http://localhost/e-pharma/public/paypal_cancel.php';
+// per kthimi dhe anulimin e pageses
+$return_url = 'http://localhost/e-pharma/public/paypal_return.php';//kur pagesa perfundohet me kujdes sepse tek kjo faqe bejm capture order
+$cancel_url = 'http://localhost/e-pharma/public/paypal_cancel.php';// kur klienti anulon pagesen , nuk ruhet asgje ne db
 
 list($ok, $err, $data) = paypal_create_order($total, $currency, $return_url, $cancel_url);
 

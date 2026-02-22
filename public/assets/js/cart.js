@@ -18,8 +18,7 @@ $(function () {
                     if (typeof res.cart_count !== "undefined") {
                         $("#cart-count").text(res.cart_count);
                     }
-                    // opsionale
-                    // alert("U shtua në shportë!");
+
                 } else {
                     // nëse s’je logged in → login
                     if (res && (res.error === "Not logged in" || res.message === "Not logged in")) {
@@ -35,10 +34,7 @@ $(function () {
                     window.location.href = "/e-pharma/public/login.php";
                     return;
                 }
-
-                // ✅ FIX për rastin tënd: serveri kthen 302 redirect te login.php
-                // jQuery e quan "parsererror" sepse priste JSON dhe mori HTML
-                if (
+                  if (
                     (xhr.status === 302) ||
                     (xhr.responseURL && xhr.responseURL.indexOf("login.php") !== -1) ||
                     (xhr.responseText && xhr.responseText.toLowerCase().indexOf("<html") !== -1)

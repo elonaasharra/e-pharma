@@ -11,7 +11,7 @@ if (!isset($_POST["action"]) || $_POST["action"] !== "update_profile") {
     exit;
 }
 
-// ✅ Auth check
+//  Auth check
 $user_id = (int)($_SESSION["user_id"] ?? 0);
 if ($user_id <= 0) {
     http_response_code(401);
@@ -29,6 +29,7 @@ if (!preg_match($alpha_regex, $name)) {
     echo json_encode(["status" => "error", "message" => "Invalid name"]);
     exit;
 }
+
 if (!preg_match($alpha_regex, $surname)) {
     http_response_code(422);
     echo json_encode(["status" => "error", "message" => "Invalid surname"]);
@@ -39,8 +40,10 @@ if (!preg_match($alpha_regex, $surname)) {
 $photo_name_db = null;
 $upload_dir = __DIR__ . "/../uploads/";
 
-if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE) {
+//kontrollojm nese u dergua file
 
+if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE) {
+     //kontrollon gabimet gjat upload
     if ($_FILES["photo"]["error"] !== UPLOAD_ERR_OK) {
         http_response_code(400);
         echo json_encode(["status" => "error", "message" => "Upload error"]);
@@ -64,12 +67,12 @@ if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE)
         echo json_encode(["status" => "error", "message" => "Max photo size is 2MB"]);
         exit;
     }
-
+//krijon folderin nese nk ekziston
     if (!is_dir($upload_dir)) {
         @mkdir($upload_dir, 0777, true);
     }
 
-    $newname = "u".$user_id."_".time().".".$ext;
+    $newname = "u".$user_id."_".time().".".$ext;//krijon emer unik
 
     if (!move_uploaded_file($tmp, $upload_dir.$newname)) {
         http_response_code(500);
@@ -79,7 +82,8 @@ if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE)
 
     $photo_name_db = $newname;
 
-    // (opsionale) fshi foton e vjetër
+    // fshi foton e vjetër
+
     $stmtOld = mysqli_prepare($conn, "SELECT profile_photo FROM users WHERE id = ? LIMIT 1");
     if ($stmtOld) {
         mysqli_stmt_bind_param($stmtOld, "i", $user_id);
@@ -97,7 +101,7 @@ if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] !== UPLOAD_ERR_NO_FILE)
     }
 }
 
-// ✅ update DB me prepared statements
+//  update DB me prepared statements
 if ($photo_name_db !== null) {
     $stmt = mysqli_prepare(
         $conn,

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . "/db.php";
 
-function generateRememberToken(): string {
+function generateRememberToken(): string {      //funksion i cili gjeneron token per cookies
     return bin2hex(random_bytes(32));
 }
 
@@ -11,11 +11,11 @@ function rememberMeAutoLogin(mysqli $conn): bool
         session_start();
     }
 
-    if (isset($_SESSION["user_id"])) {
+    if (isset($_SESSION["user_id"])) {  //nese user_id eshte i loguar dmth qe ka userid ne session dhe skemi nevoje te kontrollojm cookie
         return true;
     }
 
-    if (empty($_COOKIE["remember_me"])) {
+    if (empty($_COOKIE["remember_me"])) { //nese cookie remember me esht bosh ose nuk ekziston ska si te behet autologin
         return false;
     }
 
@@ -28,16 +28,17 @@ function rememberMeAutoLogin(mysqli $conn): bool
             WHERE rt.token_hash = ?
               AND rt.expires_at > NOW()
             LIMIT 1";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) return false;
 
-    $stmt->bind_param("s", $token_hash);
-    $stmt->execute();
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) return false;//nese premare deshton dmth
+
+    $stmt->bind_param("s", $token_hash);//mbush ? me token hash
+    $stmt->execute();//ekzekutohet query ne databaz
     $res = $stmt->get_result();
     $row = $res ? $res->fetch_assoc() : null;
 
     if (!$row) {
-        return false;
+        return false; //nese nuk u gjet token ose ka skaduar , nuk behet autologin dhe kthehet false
     }
 
     $_SESSION["user_id"] = (int)$row["user_id"];
@@ -45,7 +46,6 @@ function rememberMeAutoLogin(mysqli $conn): bool
     $_SESSION["role_id"] = (int)$row["role_id"];
     $_SESSION["last_activity"] = time();
 
-    // opsionale: ruaj last_used_at (nëse e ke kolonë)
     // $upd = $conn->prepare("UPDATE remember_tokens SET last_used_at = NOW() WHERE id = ?");
     // if ($upd) { $rid = (int)$row["rt_id"]; $upd->bind_param("i", $rid); $upd->execute(); }
 

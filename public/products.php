@@ -7,10 +7,7 @@ require_once __DIR__ . '/../includes/cart.php';
 
 // Auto-login nëse ekziston remember_me cookie
 rememberMeAutoLogin($conn);
-
-/**
- * HEADER sipas login
- */
+//percaktojm headerin ne baz te kushtit nese esht apo jo i loguar
 if (isset($_SESSION["user_id"])) {
     require_once __DIR__ . '/../includes/login/header.php';
 } else {
@@ -20,9 +17,8 @@ if (isset($_SESSION["user_id"])) {
 $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
 $cart_count = $user_id ? cart_count_items($conn, $user_id) : 0;
 
-/**
- * KATEGORITË (duhet të përputhen me Home)
- */
+
+
 $categories = [
         'dermokozmetike' => 'Dermo Cosmetic',
         'baby'           => 'Mom & Kids',
@@ -32,48 +28,27 @@ $categories = [
         'oralcare'       => 'Oralcare',
 ];
 
-/**
- * Lexo kategorinë nga URL
- * products.php?cat=dermokozmetike
- */
+
+//  Lexo kategorinë nga URL
+//  products.php?cat=dermokozmetike
+
 $cat = isset($_GET['cat']) ? trim($_GET['cat']) : '';
 if ($cat !== '' && !isset($categories[$cat])) {
     $cat = '';
 }
-//  KETE HOQA
-//
-//$res = null;
-//
-//if ($cat !== '') {
-//    $sql = "SELECT id, name, description, price, stock, image
-//            FROM products
-//            WHERE is_active = 1 AND category_slug = ?
-//            ORDER BY created_at DESC";
-//    $stmt = $conn->prepare($sql);
-//    $stmt->bind_param("s", $cat);
-//    $stmt->execute();
-//    $res = $stmt->get_result();
-//} else {
-//    $sql = "SELECT id, name, description, price, stock, image
-//            FROM products
-//            WHERE is_active = 1
-//            ORDER BY created_at DESC";
-//    $res = $conn->query($sql);
-//}
 
-// SHTOVA KETE KOD
-$q = isset($_GET['q']) ? trim($_GET['q']) : '';
+$q = isset($_GET['q']) ? trim($_GET['q']) : '';  // marrim tekstin e kerkimit
 
-$res = null;
+$res = null; // variabel ndihmese e cila do te mbaj rezultatin e querit
 
 $sql = "SELECT id, name, description, price, stock, image
         FROM products
         WHERE is_active = 1";
 
-$params = [];
-$types  = "";
+$params = []; //vlerat reale
+$types  = ""; // lloji i tyre
 
-// filter kategori
+//bejme filtrimin sipas kategorise
 if ($cat !== '') {
     $sql .= " AND category_slug = ?";
     $types .= "s";
@@ -82,7 +57,7 @@ if ($cat !== '') {
 
 // search text
 if ($q !== '') {
-    $sql .= " AND (name LIKE ? OR description LIKE ?)";
+    $sql .= " AND (name LIKE ? OR description LIKE ?)"; //bashko tekstin ekzistues me tekstin e ri dhe ruaje përsëri në të njëjtën variabël.
     $types .= "ss";
     $like = "%" . $q . "%";
     $params[] = $like;
@@ -117,7 +92,6 @@ $res = $stmt->get_result();
     <!-- ================= FILTER LINKS ================= -->
     <!-- ================= FILTER LINKS (BOOTSTRAP PILLS) ================= -->
     <style>
-        /* vetem pak polish (opsionale) */
         .filter-bar{
             background: #fff;
             border: 1px solid rgba(0,0,0,.08);
@@ -163,6 +137,8 @@ $res = $stmt->get_result();
                     Të gjitha
                 </a>
             </li>
+<!--gjeneron automatikisht menune e kategorive dhe thekson kategorine qe perdoruesi ka zgjedhur-->
+<!--            slug esht celsi dhe label esht emri qe shfaqet ne menu-->
 
             <?php foreach ($categories as $slug => $label): ?>
                 <li class="nav-item">
@@ -213,7 +189,7 @@ $res = $stmt->get_result();
                                 Stok: <?php echo (int)$p['stock']; ?>
                             </p>
 
-                            <!-- ✅ FIX: përdor .js-add-to-cart që e kap cart.js -->
+                            <!--  FIX: përdor .js-add-to-cart që e kap cart.js -->
                             <a
                                     href="#"
                                     class="btn btn-primary btn-sm js-add-to-cart <?php echo $outOfStock ? 'disabled' : ''; ?>"
@@ -231,6 +207,8 @@ $res = $stmt->get_result();
         <?php else: ?>
             <div class="col-12">
                 <p class="text-muted">
+
+<!--                    kushti ? vlera_nëse_true : vlera_nëse_false;-->
                     Nuk ka produkte<?php echo $cat ? " për këtë kategori." : " për momentin."; ?>
                 </p>
             </div>
@@ -240,9 +218,7 @@ $res = $stmt->get_result();
 </div>
 
 <?php
-/**
- * FOOTER sipas login
- */
+
 if (isset($_SESSION["user_id"])) {
     include_once __DIR__ . '/../includes/login/footer.php';
 } else {

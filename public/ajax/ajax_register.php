@@ -10,7 +10,6 @@ if (!isset($_POST["action"]) || $_POST["action"] !== "register") {
     echo json_encode(["message" => "Invalid action"]);
     exit;
 }
-
 $name = isset($_POST["name"]) ? trim($_POST["name"]) : "";
 $surname = isset($_POST["surname"]) ? trim($_POST["surname"]) : "";
 $email = isset($_POST["email"]) ? trim($_POST["email"]) : "";
@@ -93,7 +92,6 @@ $data = [
     "token" => $verify_token
 ];
 sendEmail($data);
-
 // SUCCESS
 http_response_code(200);
 echo json_encode([

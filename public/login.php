@@ -1,9 +1,9 @@
 <?php include_once __DIR__ . '/../includes/no_login/header.php'; ?>
-
 <div class="register-page">
     <div class="register-wrapper" style="max-width:520px; width:100%;">
 
         <h3 class="mb-4 text-center">Login</h3>
+
         <?php if (isset($_GET['verified']) && $_GET['verified'] == '1'): ?>
             <div class="alert alert-success">
                  Email u verifikua me sukses. Tani mund të logohesh.
@@ -11,8 +11,9 @@
         <?php endif; ?>
 
         <form id="loginForm" novalidate>
-<!--ndryshimet -->
+           <!--ndryshimet -->
             <div id="loginAlert" class="alert d-none" role="alert"></div>
+<!--            // ktu do vendoset ndnj mesazh-->
 
             <div class="form-group mb-4">
                 <input type="email" class="form-control" placeholder="Email"

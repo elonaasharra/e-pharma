@@ -4,13 +4,15 @@
     <div class="register-wrapper" style="max-width:520px; width:100%;">
 
         <h3 class="mb-4 text-center">Create Account</h3>
+<!--        vend ku shtohen mesazhe gabimi ose suksesi gjat krijimit te accountit-->
         <div id="registerAlert" class="alert d-none" role="alert"></div>
-
+<!--        no validate perdoret per te caktivizuar validimin default te browserit qe validimin ta bejm vet ne js dhe backend-->
         <form id="registerForm" novalidate  >
-
+<!--        form grupi ben grumbullimin e elementeve te formes -->
             <div class="form-group mb-4">
                 <input type="text" class="form-control" placeholder="Name"
                        name="name" id="name">
+<!--        vend ku shfaqet gabimi per emrin-->
                 <span id="name_message" class="pull-left text-danger"></span>
             </div>
 

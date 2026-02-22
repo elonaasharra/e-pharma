@@ -6,6 +6,7 @@
 
         <form id="resetForm" method="post" novalidate>
             <input type="hidden" id="token" value="<?php echo htmlspecialchars($_GET["token"] ?? ""); ?>">
+<!--            merr token e siguris nga url-->
 
             <div class="form-group mb-4">
                 <input type="password" class="form-control" placeholder="New Password"

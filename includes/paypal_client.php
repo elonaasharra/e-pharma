@@ -1,13 +1,11 @@
 <?php
 require_once __DIR__ . '/paypal_config.php';
-require_once __DIR__ . '/third_party_logger.php';
+require_once __DIR__ . '/third_party_logger.php';  // ka funksion per te ruajtur request/response ne db ose file log
 
-/**
- * Simple cURL helper
- */
-function paypal_curl($method, $url, $headers, $body)
+function paypal_curl($method, $url, $headers, $body)  // funksion ndihmes i cili ben kerkesen http me curl
 {
-    $ch = curl_init($url);
+    //cURL esht nje pjet php qe dergon kerkesa ne internet dhe merr pergjigje nga servera te tjere
+    $ch = curl_init($url); //handler
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -24,9 +22,7 @@ function paypal_curl($method, $url, $headers, $body)
     return array($http, $resp, $err);
 }
 
-/**
- * Merr access token (PayPal v2)
- */
+//merr akses token
 function paypal_get_access_token()
 {
     $url = PAYPAL_API_BASE . '/v1/oauth2/token';
@@ -70,11 +66,9 @@ function paypal_get_access_token()
     }
 
     return null;
-}
+} // merr celsin e hyrjes
 
-/**
- * Create Order
- */
+//krijojm order
 function paypal_create_order($amount, $currency, $return_url, $cancel_url)
 {
     $token = paypal_get_access_token();
@@ -124,9 +118,7 @@ function paypal_create_order($amount, $currency, $return_url, $cancel_url)
     return array(false, 'Create order failed', $decoded);
 }
 
-/**
- * Capture Order
- */
+//capture order
 function paypal_capture_order($order_id)
 {
     $token = paypal_get_access_token();
@@ -158,4 +150,4 @@ function paypal_capture_order($order_id)
     }
 
     return array(false, 'Capture failed', $decoded);
-}
+} //finalizon pagesen dhe merr parate

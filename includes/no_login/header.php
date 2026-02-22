@@ -1,5 +1,4 @@
 <?php
-// session_start(); // do na duhet më vonë
 ?>
 <!doctype html>
 <html lang="en">
@@ -49,6 +48,7 @@
         ])):
             ?>
             <form class="col-12 col-lg-auto mb-3 mb-lg-0" method="GET" action="/e-pharma/public/products.php">
+<!--                get dmth qe forma e kerkimit shkon ne url-->
                 <input
                         type="search"
                         class="form-control"
@@ -60,6 +60,7 @@
             </form>
 
         <?php endif; ?>
+<!--        menyre per te futur html midis kushteve-->
 
 
     </div>

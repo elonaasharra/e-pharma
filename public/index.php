@@ -17,6 +17,8 @@ elseif (isset($_SESSION["user_id"])) {
     include_once __DIR__ . '/../includes/no_login/header.php';
 }
 ?>
+
+
 <?php
 // ================= BEST SELLERS =================
 $bestSql = "
@@ -156,6 +158,7 @@ if ($bestRes) {
         </div>
 
         <div class="col-12 col-md-6">
+<!--            percaktohet dhe kategoria me cat-->
             <a class="text-decoration-none" href="/e-pharma/public/products.php?cat=baby">
                 <div class="cat-card">
                     <img src="/e-pharma/public/assets/images/kategorite/mom_cover.png" alt="Baby Care">

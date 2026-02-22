@@ -101,12 +101,11 @@ if ($action === "add_user") {
 
     if ($exists) out("error", "Email already exists", 422);
 
-    // ✅ hash për login (si te ajax_login.php)
+    // hash për login (si te ajax_login.php)
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+    $verify_token = md5(uniqid((string)mt_rand(), true));
 
-    // admin e krijon direkt verified (mund ta bësh 0 nëse do)
-    $is_verified = 1;
-    $verify_token = null;
+    $is_verified = 0;
 
     // ⚠️ ke edhe kolonat password dhe hashed_password.
     // Ne do plotësojmë hashed_password; password e lëmë NULL/bosh.
@@ -118,7 +117,7 @@ if ($action === "add_user") {
     ");
     if (!$stmt) out("error", "Prepare failed", 500);
 
-    mysqli_stmt_bind_param($stmt, "sssisii",
+    mysqli_stmt_bind_param($stmt, "ssssisi",
         $name, $surname, $email, $hashed_password, $role_id, $verify_token, $is_verified
     );
 
@@ -126,12 +125,22 @@ if ($action === "add_user") {
     $err = mysqli_stmt_error($stmt);
     $newId = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
-
     if (!$ok) out("error", "DB error", 500, ["error" => $err]);
 
-    out("success", "User created", 200, ["id" => $newId]);
-}
+    try {
+        $data = [
+            "user_email" => $email,
+            "token" => $verify_token
+        ];
+        sendEmail($data);
 
+        out("success", "User created. Verification email sent.", 200, ["id" => $newId]);
+
+    } catch (Throwable $e) {
+        // edhe nëse email dështon, useri krijohet
+        out("success", "User created, but email could not be sent.", 200, ["id" => $newId]);
+    }
+}
 // -------------------- UPDATE USER --------------------
 // -------------------- UPDATE USER --------------------
 if ($action === "update_user") {

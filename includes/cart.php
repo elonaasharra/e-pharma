@@ -1,11 +1,7 @@
 <?php
-// includes/cart.php
 require_once __DIR__ . '/db.php';
 
-/**
- * Merr cart-in aktiv të user-it; nëse s'ka, e krijon.
- * @return int cart_id
- */
+//marrim karten aktive nga useri nese ska e krijojm
 function cart_get_or_create_active(mysqli $conn, int $user_id): int
 {
     $sql = "SELECT id FROM carts WHERE user_id = ? AND status = 'active' LIMIT 1";
@@ -25,18 +21,15 @@ function cart_get_or_create_active(mysqli $conn, int $user_id): int
     return (int)$conn->insert_id;
 }
 
-/**
- * Shto produkt në shportë.
- * - nëse ekziston rreshti (cart_id, product_id) => rrit quantity
- * - përndryshe => krijon rresht të ri
- * RREGULLIM: kontroll stokun dhe mos lejo sasi > stok.
- */
+
+//  Shto produkt në shport.
+// nëse ekziston rreshti (cart_id, product_id) => rrit quantity përndryshe => krijon rresht të ri
+// RREGULLIM: kontroll stokun dhe mos lejo sasi > stok.
+
 function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1): array
 {
     if ($qty < 1) $qty = 1;
-
     $cart_id = cart_get_or_create_active($conn, $user_id);
-
     // Merr çmimin + stok + aktiv nga products
     $sql = "SELECT price, stock, is_active FROM products WHERE id = ? LIMIT 1";
     $stmt = $conn->prepare($sql);
@@ -58,8 +51,7 @@ function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1
     if ($stock <= 0) {
         return ["ok" => false, "error" => "Nuk ka stok për këtë produkt."];
     }
-
-    // Sa është aktualisht në shportë?
+//saesht aktualisht ne shporte?
     $sql = "SELECT quantity FROM cart_items WHERE cart_id = ? AND product_id = ? LIMIT 1";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $cart_id, $product_id);
@@ -98,7 +90,8 @@ function cart_add_item(mysqli $conn, int $user_id, int $product_id, int $qty = 1
     return ["ok" => true, "cart_id" => $cart_id];
 }
 
-/** Fshi produktin nga shporta aktive */
+// Fshi produktin nga shporta aktive
+
 function cart_remove_item(mysqli $conn, int $user_id, int $product_id): array
 {
     $sql = "SELECT id FROM carts WHERE user_id = ? AND status = 'active' LIMIT 1";
@@ -122,7 +115,7 @@ function cart_remove_item(mysqli $conn, int $user_id, int $product_id): array
     return ["ok" => true];
 }
 
-/** Numri total i artikujve (shuma e quantity) në shportën aktive */
+// Numri total i artikujve (shuma e quantity) në shportën aktive
 function cart_count_items(mysqli $conn, int $user_id): int
 {
     $sql = "SELECT COALESCE(SUM(ci.quantity), 0) AS cnt
@@ -144,7 +137,8 @@ function cart_count_items(mysqli $conn, int $user_id): int
 
 function cart_get_total(mysqli $conn, int $user_id): float
 {
-    $sql = "SELECT COALESCE(SUM(ci.quantity * ci.unit_price), 0) AS total
+//    COALESCE është një funksion në SQL që përdoret për të shmangur vlerat bosh (NULL).
+    $sql = "SELECT COALESCE(SUM(ci.quantity * ci.unit_price), 0) AS total  
             FROM carts c
             LEFT JOIN cart_items ci ON ci.cart_id = c.id
             WHERE c.user_id = ? AND c.status = 'active'";

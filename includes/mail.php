@@ -36,7 +36,6 @@ function sendEmail($data) {
         }
 
         $mail->Subject = $subject;
-
         $mail->Body = '
 <div style="font-family: Arial, sans-serif; background:#f4f4f4; padding:30px;">
   <div style="max-width:600px; background:#ffffff; padding:30px; margin:auto; border-radius:8px; text-align:center;">

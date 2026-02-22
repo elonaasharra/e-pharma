@@ -1,0 +1,16 @@
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP / Logs
+*.log
+
+# Uploads (generated files)
+public/uploads/
+
+# Secrets / configs (DO NOT COMMIT)
+includes/paypal_config.php

@@ -1,4 +1,3 @@
-/* ===================== Sticky vetëm topbar (NAV) ===================== */
 .topbar-sticky{
     position: sticky;
     top: 0;
@@ -6,7 +5,6 @@
     background: #f8f9fa; /* bg-light */
 }
 
-/* pak hije kur rri sipër */
 .topbar-sticky{
     box-shadow: 0 6px 16px rgba(0,0,0,.06);
 }
